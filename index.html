@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12352a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jass">
 <title>Sidi Barrani</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,11 +27,14 @@
   --f-display: 'Grenze Gotisch', 'UnifrakturMaguntia', Georgia, serif;
   --f-body: 'Barlow Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
   --f-chalk: 'Caveat', 'Segoe Print', 'Comic Sans MS', cursive;
-  --cw: clamp(46px, 11.5vw, 82px);
+  --cw: clamp(46px, 11.5vw, 82px);   /* Handkarten; wird per JS an Breite und Höhe angepasst */
+  --bw: calc(var(--cw) * .5);        /* Kartenrücken der Mitspieler */
+  --tw: var(--cw);                   /* Karten im Stich */
   --overlap: 0px;
   color-scheme: dark;
 }
 html, body { height: 100%; }
+body { margin: 0; }
 body {
   background: radial-gradient(ellipse at 50% 45%, var(--felt) 0%, var(--felt-deep) 85%);
   background-color: var(--felt-deep);
@@ -33,7 +44,7 @@ body {
   overflow: hidden;
 }
 #app {
-  height: 100%;
+  height: 100%; height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr;
   padding-left: max(12px, env(safe-area-inset-left, 0px));
@@ -44,7 +55,7 @@ body {
   max-width: 980px;
   margin: 0 auto;
 }
-button { font-family: inherit; color: inherit; }
+button { font-family: inherit; color: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
 /* ---------- Kopf: Titel + Jasstafel ---------- */
@@ -126,7 +137,7 @@ header {
 .backs { display: flex; }
 .backs.v { flex-direction: column; }
 .back {
-  width: calc(var(--cw) * .5); height: calc(var(--cw) * .75);
+  width: var(--bw); height: calc(var(--bw) * 1.5);
   border-radius: 4px; border: 1.5px solid var(--paper);
   background:
     repeating-linear-gradient(45deg, rgba(251,245,230,.18) 0 2px, transparent 2px 7px),
@@ -134,9 +145,9 @@ header {
     #8e2328;
   box-shadow: 0 1px 2px rgba(0,0,0,.4);
 }
-.backs .back + .back { margin-left: calc(var(--cw) * -.36); }
-.backs.v .back { width: calc(var(--cw) * .5); height: calc(var(--cw) * .34); }
-.backs.v .back + .back { margin-left: 0; margin-top: calc(var(--cw) * -.22); }
+.backs .back + .back { margin-left: calc(var(--bw) * -.72); }
+.backs.v .back { width: var(--bw); height: calc(var(--bw) * .68); }
+.backs.v .back + .back { margin-left: 0; margin-top: calc(var(--bw) * -.44); }
 
 .info { grid-area: info; display: flex; justify-content: center; min-height: 26px; }
 .contract {
@@ -158,7 +169,8 @@ svg[viewBox^="-17"] { width: 25px !important; }
 .contract .dir.flip { background: var(--brass); color: #2a1d05; animation: pop .25s ease-out; }
 @media (prefers-reduced-motion: reduce) { .contract .dir.flip { animation: none; } }
 
-.center { grid-area: c; position: relative; min-height: calc(var(--cw) * 2.6); }
+.center { grid-area: c; position: relative; min-height: calc(var(--tw) * 2.6); }
+.center .card { width: var(--tw); height: calc(var(--tw) * 1.5); }
 .slot { position: absolute; transform: translate(-50%, -50%); transition: transform .25s ease; }
 .slot.p0 { left: 50%; top: 74%; }
 .slot.p1 { left: 74%; top: 50%; }
@@ -183,7 +195,9 @@ svg[viewBox^="-17"] { width: 25px !important; }
 .hand .card { cursor: default; transition: transform .15s ease, filter .15s; }
 .hand .card + .card { margin-left: calc(var(--overlap) * -1); }
 .hand .card.playable { cursor: pointer; }
-.hand .card.playable:hover, .hand .card.playable:focus-visible { transform: translateY(-10px); }
+@media (hover: hover) { .hand .card.playable:hover { transform: translateY(-10px); } }
+.hand .card.playable:focus-visible { transform: translateY(-10px); }
+.hand .card.playable:active { transform: translateY(-6px); }
 .hand .card.dim { filter: brightness(.55) saturate(.6); }
 @media (prefers-reduced-motion: reduce) { .hand .card, .slot { transition: none; } }
 
@@ -210,6 +224,7 @@ svg[viewBox^="-17"] { width: 25px !important; }
   box-shadow: 0 10px 30px rgba(0,0,0,.55);
   padding: 14px 14px 12px; box-sizing: border-box;
   display: flex; flex-direction: column; gap: 10px;
+  max-height: calc(100% - 8px); overflow-y: auto; overscroll-behavior: contain;
 }
 .panel h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 24px; color: #6b1f22; text-wrap: balance; }
 .panel .hint { font-size: 13px; color: #5d554b; margin: 0; }
@@ -272,6 +287,65 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
 }
 @media (prefers-reduced-motion: reduce) { .weis-show, .weis-show .bar { animation: none; } }
 
+/* ---------- Handy hochkant (Klasse .ph): Hand in zwei Reihen, grosse Karten zum Antippen ---------- */
+.ph #app { padding-block: 4px 6px; gap: 4px; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); }
+.ph header { flex-wrap: nowrap; gap: 8px; }
+.ph .brand h1 { font-size: 22px; }
+.ph .brand .sub { display: none; }
+.ph .tools { flex-direction: row; align-items: center; gap: 6px; }
+.ph .ghost { padding: 3px 10px; font-size: 12px; }
+.ph .tafel { border-width: 3px; padding: 2px 8px; column-gap: 10px; }
+.ph .tafel .who { font-size: 14px; }
+.ph .tafel .pts { font-size: 19px; }
+.ph .tafel .goal { display: none; }
+.ph .kontra-btn { margin-top: 3px; padding: 3px 6px; font-size: 12px; }
+.ph .kontra-btn small { font-size: 10px; }
+.ph .table { grid-template-columns: auto 1fr auto; gap: 3px; }
+.ph .seat.n { flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 6px; }
+.ph .hand { flex-wrap: wrap; gap: 5px 4px; padding-top: 6px; }
+.ph .hand .card + .card { margin-left: 0; }
+.ph .contract { font-size: 13px; padding: 2px 10px; gap: 6px; }
+.ph .status { font-size: 13px; }
+.ph .name { font-size: 12px; }
+
+/* ---------- Handy quer (Klasse .ls): Tafel rechts als Spalte, Tisch nutzt die volle Höhe ---------- */
+.ph { --bw: calc(var(--cw) * .42); --tw: calc(var(--cw) * .82); }
+.ls { --bw: calc(var(--cw) * .42); --tw: calc(var(--cw) * .78); }
+/* Reiz- und Richtungsfenster auf dem Handy: oben am Tisch, die eigene Hand bleibt sichtbar */
+.ph .panel.live, .ls .panel.live { top: 2px; transform: translateX(-50%); max-height: calc(var(--free, 100%) - 4px); padding: 9px 10px; gap: 6px; }
+.ph .panel.live h2, .ls .panel.live h2 { font-size: 18px; }
+.ph .panel.live .hint, .ls .panel.live .hint { font-size: 12.5px; }
+.ph .panel.live .lx, .ls .panel.live .lx, .ls .panel.live .lbl { display: none; }
+.ph .panel.live[aria-label="Reizen"] h2, .ph .panel.live .lbl { display: none; }
+.ph .panel.live .hint { color: var(--ink); font-size: 13.5px; }
+.ph .panel.live .chips, .ls .panel.live .chips { gap: 4px; }
+.ph .panel.live .chip, .ls .panel.live .chip { padding: 4px 7px; font-size: 14px; min-height: 32px; }
+.ph .panel.live .btn, .ls .panel.live .btn { padding: 7px 14px; }
+.ph .panel.live .chips.modes { display: grid; grid-template-columns: repeat(4, 1fr); }
+.ph .panel.live .chips.modes .chip { flex-direction: column; gap: 1px; padding: 4px 2px; font-size: 12.5px; line-height: 1.1; justify-content: center; }
+.ph .seat.n .bubble, .ls .seat.n .bubble { top: 0; right: 2px; margin-top: 0; }
+.ph .panel.live > .row, .ls .panel.live > .row { position: sticky; bottom: -9px; margin: 0 -10px -9px; padding: 6px 10px 9px; background: var(--paper); box-shadow: 0 -6px 10px -6px rgba(0,0,0,.25); }
+.ls #app { grid-template-columns: 1fr auto; grid-template-rows: 1fr; max-width: none; padding-block: 4px; gap: 10px;
+  padding-bottom: max(4px, env(safe-area-inset-bottom, 0px)); }
+.ls header { order: 2; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; gap: 6px; width: 112px; }
+.ls .brand h1 { font-size: 19px; }
+.ls .brand .sub { display: none; }
+.ls .tools { flex-direction: column-reverse; align-items: stretch; gap: 6px; }
+.ls .tafel { border-width: 3px; padding: 2px 8px; column-gap: 8px; }
+.ls .tafel .who { font-size: 13px; white-space: normal; line-height: 1.05; }
+.ls .tafel .pts { font-size: 19px; }
+.ls .kontra-btn { padding: 6px 4px; }
+.ls .table { gap: 2px; grid-template-columns: auto 1fr auto; }
+.ls .seat.n { flex-direction: row; justify-content: center; gap: 8px; }
+.ls .hand { padding-top: 6px; }
+.ls .contract { font-size: 13px; padding: 1px 10px; }
+.ls .info { min-height: 22px; }
+.ls .status { font-size: 13px; min-height: 18px; }
+.ls .name { font-size: 12px; }
+.ls .panel { width: min(600px, calc(100% - 8px)); padding: 10px 12px; gap: 7px; }
+.ls .panel h2 { font-size: 20px; }
+.ls .chip { padding: 4px 8px; font-size: 14px; }
+
 /* ---------- Siegesfeier: Feuerwerk mit Namen ---------- */
 .fw { position: fixed; inset: 0; z-index: 40; background: rgba(4, 10, 14, .78); cursor: pointer; animation: fwin .4s ease-out; }
 .fw.out { opacity: 0; transition: opacity .6s ease; }
@@ -288,6 +362,9 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
 @keyframes fwcap { from { opacity: 0; transform: translateY(12px); } }
 @media (prefers-reduced-motion: reduce) { .fw, .fw .cap { animation: none; } }
 </style>
+</head>
+<body>
+
 
 <div id="app">
   <header>
@@ -2227,7 +2304,7 @@ function renderSeats() {
       el.innerHTML = name + call + `<div class="backs${v ? ' v' : ''}" aria-label="${n} Karten">${'<div class="back"></div>'.repeat(n)}</div>` + b;
     }
   }
-  fitHand();
+  layout();
 }
 
 // Letzte Ansage eines Sitzes, sichtbar bis das Reizen endet
@@ -2256,11 +2333,31 @@ function handHTML() {
   }).join('')}</div>`;
 }
 
+// Kartengrösse an den Bildschirm anpassen: Breite gibt den Startwert, dann wird verkleinert,
+// bis die eigene Hand ganz sichtbar ist. Handy hochkant (.ph) und Handy quer (.ls) haben eigene Layouts.
+function layout() {
+  const root = document.documentElement, W = window.innerWidth, H = window.innerHeight;
+  const ph = W <= 600 && H > W, ls = !ph && H <= 520 && W > H;
+  root.classList.toggle('ph', ph); root.classList.toggle('ls', ls);
+  const table = $('table'), app = $('app'), me = $('seat0');
+  if (!table || !me) return;
+  const tw = table.getBoundingClientRect().width;
+  let cw = ph ? Math.min(92, Math.floor((tw - 4 * 4 - 2) / 5))
+         : ls ? Math.min(86, Math.floor((tw - 8) / 9.3))
+         : Math.max(46, Math.min(82, W * .115));
+  const apply = () => { root.style.setProperty('--cw', cw + 'px'); fitHand(); };
+  apply();
+  const limit = () => Math.min(app.getBoundingClientRect().bottom, window.innerHeight) - 1;
+  while (cw > 34 && me.getBoundingClientRect().bottom > limit()) { cw -= 2; apply(); }
+  const hand = $('hand') || me;
+  root.style.setProperty('--free', Math.max(140, hand.getBoundingClientRect().top - table.getBoundingClientRect().top) + 'px');
+}
+
 function fitHand() {
   const hand = $('hand');
   if (!hand) return;
   const n = hand.children.length;
-  if (n < 2) { document.documentElement.style.setProperty('--overlap', '0px'); return; }
+  if (n < 2 || document.documentElement.classList.contains('ph')) { document.documentElement.style.setProperty('--overlap', '0px'); return; }
   const cw = hand.children[0].getBoundingClientRect().width;
   const avail = $('table').getBoundingClientRect().width - 4;
   const step = Math.min(cw + 4, (avail - cw) / (n - 1));
@@ -2294,7 +2391,7 @@ function renderOverlay() {
 
 function directionPanelHTML() {
   const quer = g.mode === 8;
-  return `<div class="panel" role="dialog" aria-label="Startrichtung">
+  return `<div class="panel live" role="dialog" aria-label="Startrichtung">
     <h2>${BID_NAME(g.mode)} – womit beginnst du?</h2>
     <p class="hint">Du hast ${g.bid} ${BID_NAME(g.mode)} bekommen${g.kontra ? ` (Kontra von ${NAMES[g.kontraBy]})` : ''}. ${quer ? 'Die ersten 4 Stiche gehen in die Startrichtung, die letzten 5 in die Gegenrichtung.' : 'Die Richtung wechselt jeden Stich.'} Die Startrichtung bestimmt auch die Kartenwerte: mit Obenabe zählen die Asse, mit Undenufe die Sechser.</p>
     <div class="row" style="justify-content:stretch">
@@ -2308,13 +2405,13 @@ function bidPanelHTML() {
   const allowed = g.allowedBids();
   if (selAmount !== null && !allowed.includes(selAmount)) selAmount = null;
   const canBid = selAmount !== null && selMode !== null;
-  return `<div class="panel" role="dialog" aria-label="Reizen">
+  return `<div class="panel live" role="dialog" aria-label="Reizen">
     <h2>${hb ? 'Überbieten oder passen' : 'Dein Gebot'}</h2>
-    <p class="hint">${hb ? `Höchstes Gebot: <b>${bidText(hb)}</b> von ${NAMES[hb.p]}${J.team(hb.p) === 0 && hb.p !== 0 ? ' (dein Partner)' : ''}.` : 'Wie viele Kartenpunkte macht ihr zu zweit? Maximum 157, Match 257.'}${g.phase === 'kontra' ? ' Kontra geht über den roten Knopf an der Tafel.' : ''}</p>
+    <p class="hint">${hb ? `Höchstes Gebot: <b>${bidText(hb)}</b> von ${NAMES[hb.p]}${J.team(hb.p) === 0 && hb.p !== 0 ? ' (dein Partner)' : ''}.` : '<span class="lx">Wie viele Kartenpunkte macht ihr zu zweit? </span>Maximum 157, Match 257.'}${g.phase === 'kontra' ? '<span class="lx"> Kontra geht über den roten Knopf an der Tafel.</span>' : ''}</p>
     <div class="lbl">Punkte</div>
     <div class="chips">${allowed.map(b => `<button class="chip" data-amt="${b}" aria-pressed="${selAmount === b}">${b}</button>`).join('')}</div>
-    <div class="lbl">Spielart · Kartenpunkte, Weis und Stöck zählen mit dem Faktor</div>
-    <div class="chips">${J.BID_MODES.map(m => `<button class="chip" data-mode="${m}" aria-pressed="${selMode === m}">${bidModeIcon(m)}${BID_NAME(m)} ${X(m)}</button>`).join('')}</div>
+    <div class="lbl">Spielart<span class="lx"> · Kartenpunkte, Weis und Stöck zählen mit dem Faktor</span></div>
+    <div class="chips modes">${J.BID_MODES.map(m => `<button class="chip" data-mode="${m}" aria-pressed="${selMode === m}">${bidModeIcon(m)}${BID_NAME(m)} ${X(m)}</button>`).join('')}</div>
     <div class="row">
       <button class="btn sec" data-act="pass">Passen</button>
       <button class="btn" data-act="bid" ${canBid ? '' : 'disabled'}>${canBid ? 'Reize ' + selAmount + ' ' + BID_NAME(selMode) : 'Reizen'}</button>
@@ -2382,7 +2479,8 @@ document.addEventListener('click', e => {
     render(); step();
   }
 });
-window.addEventListener('resize', fitHand);
+window.addEventListener('resize', layout);
+window.addEventListener('orientationchange', () => setTimeout(layout, 250));
 
 // Regeln-Knopf im Kopf
 const tools = document.querySelector('.tools');
@@ -2410,3 +2508,6 @@ window.claude?.hot?.snapshot?.(snapshot);
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 })();
 </script>
+
+</body>
+</html>
