@@ -1,0 +1,2412 @@
+<title>Sidi Barrani</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Barlow+Semi+Condensed:wght@400;500;600&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: Ein-Bildschirm-Jasstisch. Kopf mit Kreide-Jasstafel, darunter der Filz mit vier Sitzen und Stichfeld. */
+:root {
+  --felt: #1d4a38;
+  --felt-deep: #12352a;
+  --slate: #26302c;
+  --chalk: #efede3;
+  --chalk-dim: #b9bcae;
+  --paper: #fbf5e6;
+  --ink: #2a2520;
+  --brass: #d8a531;
+  --red: #b52a2f;
+  --line: rgba(239, 237, 227, .18);
+  --f-display: 'Grenze Gotisch', 'UnifrakturMaguntia', Georgia, serif;
+  --f-body: 'Barlow Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --f-chalk: 'Caveat', 'Segoe Print', 'Comic Sans MS', cursive;
+  --cw: clamp(46px, 11.5vw, 82px);
+  --overlap: 0px;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: radial-gradient(ellipse at 50% 45%, var(--felt) 0%, var(--felt-deep) 85%);
+  background-color: var(--felt-deep);
+  color: var(--chalk);
+  font-family: var(--f-body);
+  font-size: 15px;
+  overflow: hidden;
+}
+#app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
+  padding-block: 8px 6px;
+  gap: 6px;
+  box-sizing: border-box;
+  max-width: 980px;
+  margin: 0 auto;
+}
+button { font-family: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* ---------- Kopf: Titel + Jasstafel ---------- */
+header {
+  display: flex; align-items: stretch; gap: 10px; justify-content: space-between; flex-wrap: wrap;
+}
+.brand { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.brand h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 5vw, 36px); line-height: .95; margin: 0; letter-spacing: .5px; color: var(--brass); }
+.brand .sub { font-size: 12px; color: var(--chalk-dim); letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+.tafel {
+  background: var(--slate);
+  border: 5px solid #6b4b2a;
+  border-radius: 4px;
+  box-shadow: inset 0 0 18px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+  padding: 4px 12px 4px;
+  display: grid; grid-template-columns: auto auto; column-gap: 18px; align-items: baseline;
+  font-family: var(--f-chalk); color: var(--chalk);
+  flex: 0 1 auto;
+}
+.tafel .who { font-size: 17px; color: var(--chalk-dim); white-space: nowrap; }
+.tafel .pts { font-size: 26px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.kontra-btn {
+  grid-column: 1 / -1; position: relative; overflow: hidden; margin-top: 5px;
+  font-family: var(--f-body); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+  border: 1.5px dashed var(--line); border-radius: 4px; background: transparent; color: var(--chalk-dim);
+  padding: 4px 8px; cursor: not-allowed; line-height: 1.15;
+}
+.kontra-btn small { display: block; font-size: 11px; letter-spacing: .02em; text-transform: none; font-weight: 500; }
+.kontra-btn:not(:disabled) {
+  cursor: pointer; border: 1.5px solid #ff8a8f; background: var(--red); color: #fff;
+  box-shadow: 0 0 0 0 rgba(255, 120, 120, .7); animation: kpulse 1.1s ease-out infinite;
+}
+.kontra-btn.timed::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 3px; background: #fff; width: 100%;
+  animation: kdrain 3s linear forwards;
+}
+@keyframes kpulse { to { box-shadow: 0 0 0 8px rgba(255, 120, 120, 0); } }
+@keyframes kdrain { to { width: 0; } }
+@media (prefers-reduced-motion: reduce) { .kontra-btn:not(:disabled) { animation: none; } }
+.call {
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  background: var(--paper); color: var(--ink); border-radius: 6px; padding: 2px 9px;
+  font-size: 15px; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,.35);
+}
+.call svg { width: 17px; height: 17px; }
+.call.pass { background: transparent; color: var(--chalk-dim); border: 1px solid var(--line); box-shadow: none; font-weight: 500; }
+.call.hi { background: var(--brass); color: #2a1d05; outline: 2px solid #fff3c4; }
+.call.kontra { background: var(--red); color: #fff; }
+.seat.s .call { margin-top: 2px; }
+.tafel .goal { grid-column: 1 / -1; font-size: 14px; color: var(--chalk-dim); border-top: 1px dashed var(--line); margin-top: 2px; text-align: center; }
+.tools { display: flex; gap: 6px; align-items: center; }
+.ghost {
+  background: transparent; border: 1px solid var(--line); border-radius: 999px;
+  padding: 5px 12px; font-size: 13px; cursor: pointer; color: var(--chalk);
+}
+.ghost:hover { border-color: var(--brass); color: var(--brass); }
+
+/* ---------- Tisch ---------- */
+.table {
+  position: relative; min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(54px, auto) 1fr minmax(54px, auto);
+  grid-template-rows: auto auto 1fr auto auto;
+  grid-template-areas: "n n n" "info info info" "w c e" "status status status" "s s s";
+  gap: 4px;
+}
+.seat { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+.seat.n { grid-area: n; }
+.seat.w { grid-area: w; justify-content: center; }
+.seat.e { grid-area: e; justify-content: center; }
+.seat.s { grid-area: s; }
+.name {
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--chalk-dim);
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.name.turn { color: var(--brass); }
+.name.turn::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--brass); box-shadow: 0 0 8px var(--brass); }
+.name .tag { font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; letter-spacing: .04em; }
+.backs { display: flex; }
+.backs.v { flex-direction: column; }
+.back {
+  width: calc(var(--cw) * .5); height: calc(var(--cw) * .75);
+  border-radius: 4px; border: 1.5px solid var(--paper);
+  background:
+    repeating-linear-gradient(45deg, rgba(251,245,230,.18) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, rgba(251,245,230,.18) 0 2px, transparent 2px 7px),
+    #8e2328;
+  box-shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+.backs .back + .back { margin-left: calc(var(--cw) * -.36); }
+.backs.v .back { width: calc(var(--cw) * .5); height: calc(var(--cw) * .34); }
+.backs.v .back + .back { margin-left: 0; margin-top: calc(var(--cw) * -.22); }
+
+.info { grid-area: info; display: flex; justify-content: center; min-height: 26px; }
+.contract {
+  display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 14px;
+  background: rgba(0,0,0,.18);
+}
+.contract b { color: var(--brass); font-weight: 600; }
+.contract .k { color: #fff; background: var(--red); border-radius: 3px; padding: 0 6px; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+.contract svg { width: 18px; height: 18px; vertical-align: middle; }
+svg[viewBox^="-17"] { width: 25px !important; }
+.x { font-size: .82em; font-weight: 700; color: var(--brass); margin-left: 2px; font-variant-numeric: tabular-nums; }
+.chip .x, .call .x { color: #8a2a1e; }
+.chip[aria-pressed="true"] .x { color: var(--paper); }
+.contract .dir {
+  display: inline-flex; align-items: center; gap: 4px; margin-left: 2px;
+  background: var(--paper); color: var(--ink); border-radius: 4px; padding: 0 7px; font-weight: 600;
+}
+.contract .dir.flip { background: var(--brass); color: #2a1d05; animation: pop .25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .contract .dir.flip { animation: none; } }
+
+.center { grid-area: c; position: relative; min-height: calc(var(--cw) * 2.6); }
+.slot { position: absolute; transform: translate(-50%, -50%); transition: transform .25s ease; }
+.slot.p0 { left: 50%; top: 74%; }
+.slot.p1 { left: 74%; top: 50%; }
+.slot.p2 { left: 50%; top: 26%; }
+.slot.p3 { left: 26%; top: 50%; }
+.slot.win .card { box-shadow: 0 0 0 3px var(--brass), 0 4px 14px rgba(0,0,0,.5); }
+
+.status {
+  grid-area: status; text-align: center; font-size: 14px; color: var(--chalk); min-height: 20px;
+}
+.status em { font-style: normal; color: var(--brass); }
+
+/* ---------- Karten ---------- */
+.card {
+  width: var(--cw); height: calc(var(--cw) * 1.5);
+  padding: 0; border: none; background: none; border-radius: 6px; display: block;
+  box-shadow: 0 2px 5px rgba(0,0,0,.4);
+  flex: 0 0 auto;
+}
+.card svg { width: 100%; height: 100%; display: block; }
+.hand { display: flex; justify-content: center; padding-top: 10px; max-width: 100%; }
+.hand .card { cursor: default; transition: transform .15s ease, filter .15s; }
+.hand .card + .card { margin-left: calc(var(--overlap) * -1); }
+.hand .card.playable { cursor: pointer; }
+.hand .card.playable:hover, .hand .card.playable:focus-visible { transform: translateY(-10px); }
+.hand .card.dim { filter: brightness(.55) saturate(.6); }
+@media (prefers-reduced-motion: reduce) { .hand .card, .slot { transition: none; } }
+
+/* ---------- Sprechblasen ---------- */
+.bubble {
+  position: absolute; z-index: 5; white-space: nowrap;
+  background: var(--paper); color: var(--ink); font-weight: 700; font-size: 16px;
+  border-radius: 10px; padding: 3px 10px; box-shadow: 0 3px 8px rgba(0,0,0,.4);
+  pointer-events: none; animation: pop .18s ease-out;
+}
+.bubble.kontra { background: var(--red); color: #fff; }
+.seat.n .bubble { top: 100%; margin-top: 4px; }
+.seat.w .bubble { left: 100%; margin-left: 6px; top: 40%; }
+.seat.e .bubble { right: 100%; margin-right: 6px; top: 40%; }
+.seat.s .bubble { bottom: 100%; margin-bottom: 2px; }
+@keyframes pop { from { transform: scale(.85); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bubble { animation: none; } }
+
+/* ---------- Reiz-Panel / Dialoge ---------- */
+.panel {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20;
+  width: min(440px, calc(100% - 8px));
+  background: var(--paper); color: var(--ink); border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.55);
+  padding: 14px 14px 12px; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.panel h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 24px; color: #6b1f22; text-wrap: balance; }
+.panel .hint { font-size: 13px; color: #5d554b; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  border: 1.5px solid #cdbf9e; background: #fffdf6; color: var(--ink); border-radius: 7px;
+  padding: 5px 9px; font-size: 15px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.chip svg { width: 18px; height: 18px; }
+.chip[aria-pressed="true"] { border-color: #6b1f22; background: #6b1f22; color: var(--paper); }
+.row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.btn {
+  border: none; border-radius: 7px; padding: 8px 16px; font-size: 15px; font-weight: 600; cursor: pointer;
+  background: #1d4a38; color: var(--paper);
+}
+.btn.sec { background: #e8dfc8; color: var(--ink); }
+.btn.red { background: var(--red); color: #fff; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 4px; }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #7a6f60; }
+
+table.res { color: var(--ink); font-family: var(--f-body); width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 15px; }
+table.res th, table.res td { padding: 4px 6px; text-align: right; border-bottom: 1px solid #e3d8bf; }
+table.res th:first-child, table.res td:first-child { text-align: left; }
+table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px solid var(--ink); }
+.verdict { font-size: 16px; font-weight: 600; }
+.verdict.ok { color: #1d6b45; } .verdict.no { color: var(--red); }
+.rules { max-height: min(62vh, 520px); overflow-y: auto; font-size: 14px; line-height: 1.45; }
+.rules h3 { margin: 10px 0 2px; font-size: 15px; color: #6b1f22; }
+.rules p, .rules ul { margin: 0 0 4px; }
+.rules ul { padding-left: 18px; }
+.scrim { position: absolute; inset: 0; background: rgba(8, 22, 16, .45); z-index: 19; }
+
+/* ---------- Weis zeigen ---------- */
+.weis-show {
+  position: absolute; z-index: 15; pointer-events: none;
+  background: rgba(10, 30, 22, .97); border: 1.5px solid var(--brass); border-radius: 10px;
+  padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 5px; align-items: center;
+  box-shadow: 0 8px 22px rgba(0,0,0,.5); animation: wfade .2s ease-out; max-width: calc(100% - 8px);
+}
+@keyframes wfade { from { opacity: 0; } to { opacity: 1; } }
+.weis-show .wh { font-size: 14px; color: var(--chalk); white-space: nowrap; }
+.weis-show .wh b { color: var(--brass); }
+.weis-show .wh .no { color: var(--chalk-dim); }
+.weis-show .groups { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.weis-show .grp { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.weis-show .grp small { font-size: 11px; color: var(--chalk-dim); }
+.weis-show .row { display: flex; }
+.weis-show .mini { width: calc(var(--cw) * .62); height: calc(var(--cw) * .93); border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+.weis-show .mini + .mini { margin-left: calc(var(--cw) * -.2); }
+.weis-show .mini svg { width: 100%; height: 100%; display: block; }
+.weis-show .bar { height: 3px; width: 100%; background: var(--brass); border-radius: 2px; transform-origin: left; animation: kdrain 3s linear forwards; }
+.weis-show.p0 { left: calc(var(--cw) * .8); bottom: calc(var(--cw) * 1.85); }
+.weis-show.p2 { left: 50%; top: calc(var(--cw) * .95); transform: translateX(-50%); }
+.weis-show.p1 { right: calc(var(--cw) * .8); top: 38%; }
+.weis-show.p3 { left: calc(var(--cw) * .8); top: 38%; }
+@media (max-width: 640px) {
+  .weis-show.p0, .weis-show.p1, .weis-show.p3, .weis-show.p2 { left: 50%; bottom: auto; right: auto; top: calc(var(--cw) * 2.05); transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) { .weis-show, .weis-show .bar { animation: none; } }
+
+/* ---------- Siegesfeier: Feuerwerk mit Namen ---------- */
+.fw { position: fixed; inset: 0; z-index: 40; background: rgba(4, 10, 14, .78); cursor: pointer; animation: fwin .4s ease-out; }
+.fw.out { opacity: 0; transition: opacity .6s ease; }
+.fw canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fw .cap {
+  position: absolute; left: 0; right: 0; bottom: max(7%, calc(env(safe-area-inset-bottom, 0px) + 24px)); text-align: center;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  pointer-events: none; color: var(--chalk); animation: fwcap 1s ease-out 2.6s both;
+}
+.fw .cap .t { font-family: var(--f-display); font-size: clamp(28px, 7vw, 56px); color: var(--brass); text-shadow: 0 0 18px rgba(216,165,49,.55); line-height: 1.05; text-wrap: balance; }
+.fw .cap .s { font-family: var(--f-chalk); font-size: clamp(20px, 4.6vw, 30px); margin-top: 4px; }
+.fw .cap .k { font-size: 13px; color: var(--chalk-dim); margin-top: 10px; letter-spacing: .06em; text-transform: uppercase; }
+@keyframes fwin { from { opacity: 0; } }
+@keyframes fwcap { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) { .fw, .fw .cap { animation: none; } }
+</style>
+
+<div id="app">
+  <header>
+    <div class="brand">
+      <h1>Sidi Barrani</h1>
+      <div class="sub" id="teamsLine">Du &amp; Partner gegen zwei Gegner</div>
+    </div>
+    <div class="tools">
+      <div class="tafel" aria-label="Punktestand">
+        <span class="who" id="whoA">Du</span><span class="pts" id="sA">0</span>
+        <span class="who" id="whoB">Gegner</span><span class="pts" id="sB">0</span>
+        <span class="goal">bis 5000</span>
+        <button class="kontra-btn" id="kontraBtn" data-act="kontra" disabled>Kontra<small>bei Gegner-Gebot</small></button>
+      </div>
+    </div>
+  </header>
+  <main class="table" id="table">
+    <div class="seat n" id="seat2"></div>
+    <div class="info" id="info"></div>
+    <div class="seat w" id="seat3"></div>
+    <div class="center" id="center"></div>
+    <div class="seat e" id="seat1"></div>
+    <div class="status" id="status"></div>
+    <div class="seat s" id="seat0"></div>
+    <div id="weisShow"></div>
+    <div id="overlay"></div>
+  </main>
+</div>
+
+<script>/* Sidi Barrani – Spiel-Engine (reine Logik, keine Grafik). Siehe spec.md */
+(function (root) {
+  'use strict';
+
+  // ---------- Karten ----------
+  const SUITS = ['Schellen', 'Schilten', 'Eicheln', 'Rosen'];
+  // Natürliche Rangindizes tief -> hoch
+  const RANKS = ['6', '7', '8', '9', 'Banner', 'Under', 'Ober', 'König', 'Ass'];
+  const R6 = 0, R7 = 1, R8 = 2, R9 = 3, RB = 4, RU = 5, RO = 6, RK = 7, RA = 8;
+  const MODES = ['Schellen', 'Schilten', 'Eicheln', 'Rosen', 'Obenabe', 'Undenufe',
+    'Slalom Obenabe', 'Slalom Undenufe', 'Quer Obenabe', 'Quer Undenufe'];
+  const OBENABE = 4, UNDENUFE = 5, SLALOM_OBEN = 6, SLALOM_UNTEN = 7, QUER_OBEN = 8, QUER_UNTEN = 9;
+  const NUM_MODES = 10;
+  // Slalom: Richtung wechselt jeden Stich. Quer: 4 Stiche Startrichtung, dann 5 in der Gegenrichtung.
+  // Die Startrichtung bestimmt die Kartenwerte für das ganze Spiel (Summe bleibt 157).
+  function startDir(m) { return (m === SLALOM_OBEN || m === QUER_OBEN) ? OBENABE : UNDENUFE; }
+  function trickMode(m, n) {          // Richtung des Stichs n (0..8)
+    if (m < 6) return m;
+    const s = startDir(m), o = s === OBENABE ? UNDENUFE : OBENABE;
+    if (m === SLALOM_OBEN || m === SLALOM_UNTEN) return n % 2 === 0 ? s : o;
+    return n < 4 ? s : o;
+  }
+  function pointsMode(m) { return m < 6 ? m : startDir(m); }
+  // Reizen (v17): Bei Slalom und Quer wird nur die Spielart gereizt, nicht die Richtung.
+  // Gebots-Codes: 6 = Slalom, 8 = Quer (7 und 9 sind keine gültigen Gebote). Die Startrichtung wählt der
+  // Spieler erst nach dem Reizen (Phase 'direction'): Slalom -> 6 (Obenabe) / 7 (Undenufe), Quer -> 8 / 9.
+  const BID_MODES = [0, 1, 2, 3, 4, 5, SLALOM_OBEN, QUER_OBEN];
+  const BID_MODE_NAMES = { 6: 'Slalom', 8: 'Quer' };
+  function bidModeName(m) { return BID_MODE_NAMES[m] || MODES[m]; }
+  function isOpenDirection(m) { return m === SLALOM_OBEN || m === QUER_OBEN; }
+  const BID_LEVELS = [40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 157, 257];
+  const TARGET = 5000;
+  // Faktor je Spielart (v16): Kartenpunkte, Weis und Stöck werden multipliziert, Gebot und Kontra nicht.
+  // Schellen ×2, Schilten ×2, Eicheln ×1, Rosen ×5, Obenabe/Undenufe ×3, Slalom/Quer ×4
+  const MULT = [2, 2, 1, 5, 3, 3, 4, 4, 4, 4];
+
+  const suitOf = c => Math.floor(c / 9);
+  const rankOf = c => c % 9;
+  const makeCard = (s, r) => s * 9 + r;
+  const isTrumpMode = m => m >= 0 && m <= 3;
+  const isTrump = (c, m) => isTrumpMode(m) && suitOf(c) === m;
+  const team = p => p % 2;
+  const nextP = p => (p + 1) % 4;
+  const cardName = c => SUITS[suitOf(c)] + ' ' + RANKS[rankOf(c)];
+
+  // Punkte einer Karte im Modus m
+  const NONTRUMP_PTS = [0, 0, 0, 0, 10, 2, 3, 4, 11];
+  const TRUMP_PTS = [0, 0, 0, 14, 10, 20, 3, 4, 11];
+  const OBEN_PTS = [0, 0, 8, 0, 10, 2, 3, 4, 11];
+  const UNDEN_PTS = [11, 0, 8, 0, 10, 2, 3, 4, 0]; // Undenufe: 6 zählt 11, Ass 0
+  function points(c, m) {
+    m = pointsMode(m);
+    const r = rankOf(c);
+    if (m === OBENABE) return OBEN_PTS[r];
+    if (m === UNDENUFE) return UNDEN_PTS[r];
+    if (suitOf(c) === m) return TRUMP_PTS[r];
+    return NONTRUMP_PTS[r];
+  }
+
+  // Trumpf-Stärke (höher = besser): U > 9 > A > K > O > B > 8 > 7 > 6
+  const TRUMP_ORDER = [0, 1, 2, 7, 3, 8, 4, 5, 6]; // index = natürlicher Rang
+  function trumpStrength(c) { return TRUMP_ORDER[rankOf(c)]; }
+  // Stärke innerhalb der Farbe für Nicht-Trumpf/Obenabe (natürlich) bzw. Undenufe (umgekehrt)
+  function plainStrength(c, m) { return m === UNDENUFE ? 8 - rankOf(c) : rankOf(c); }
+
+  // Gewinner eines Stichs. trick = [{p, c}, ...] in Ausspielreihenfolge
+  function trickWinnerIndex(trick, m) {
+    const led = suitOf(trick[0].c);
+    let best = 0;
+    for (let i = 1; i < trick.length; i++) {
+      if (beats(trick[i].c, trick[best].c, led, m)) best = i;
+    }
+    return best;
+  }
+  // Schlägt Karte a die bisher beste Karte b?
+  function beats(a, b, led, m) {
+    const ta = isTrump(a, m), tb = isTrump(b, m);
+    if (ta && !tb) return true;
+    if (!ta && tb) return false;
+    if (ta && tb) return trumpStrength(a) > trumpStrength(b);
+    if (suitOf(a) !== suitOf(b)) return false; // abgeworfen
+    return plainStrength(a, m) > plainStrength(b, m);
+  }
+
+  // Legale Züge (spec §6)
+  function legalMoves(hand, trick, m) {
+    if (trick.length === 0) return hand.slice();
+    const led = suitOf(trick[0].c);
+    const ofLed = hand.filter(c => suitOf(c) === led);
+    if (!isTrumpMode(m)) return ofLed.length ? ofLed : hand.slice();
+
+    const T = m;
+    const trumps = hand.filter(c => suitOf(c) === T);
+    if (led === T) {
+      const onlyPuur = trumps.length === 1 && rankOf(trumps[0]) === RU;
+      if (trumps.length === 0 || onlyPuur) return hand.slice();
+      return trumps;
+    }
+    // Nicht-Trumpf ausgespielt
+    let highestTrumpInTrick = -1;
+    for (const t of trick) if (suitOf(t.c) === T) highestTrumpInTrick = Math.max(highestTrumpInTrick, trumpStrength(t.c));
+    const allTrumps = trumps.length === hand.length;
+    const trumpAllowed = c => highestTrumpInTrick < 0 || allTrumps || trumpStrength(c) > highestTrumpInTrick;
+    let cand = ofLed.length ? ofLed.concat(trumps) : hand.slice();
+    cand = cand.filter(c => suitOf(c) !== T || trumpAllowed(c));
+    if (cand.length === 0) return hand.slice(); // Sicherheitsnetz (sollte nicht vorkommen)
+    return cand;
+  }
+
+  // ---------- Weis (spec §7) ----------
+  function weisOfHand(hand, m) {
+    const list = [];
+    // Vierlinge
+    // Vier Gleiche (v14, offizielle Regeln laut Daniel): Under 200, Näll 150, alle anderen 100
+    const quartVal = { [RU]: 200, [R9]: 150, [RA]: 100, [RK]: 100, [RO]: 100, [RB]: 100, [R8]: 100, [R7]: 100, [R6]: 100 };
+    for (const r of [RU, R9, RA, RK, RO, RB, R8, R7, R6]) {
+      if ([0, 1, 2, 3].every(s => hand.includes(makeCard(s, r)))) {
+        list.push({ kind: 'vier', value: quartVal[r], n: 4, top: r, suit: null, trump: false,
+          label: '4 ' + RANKS[r] });
+      }
+    }
+    // Sequenzen
+    for (let s = 0; s < 4; s++) {
+      const rs = hand.filter(c => suitOf(c) === s).map(rankOf).sort((a, b) => a - b);
+      let i = 0;
+      while (i < rs.length) {
+        let j = i;
+        while (j + 1 < rs.length && rs[j + 1] === rs[j] + 1) j++;
+        const len = j - i + 1;
+        if (len >= 3) {
+          const value = len >= 5 ? 100 : len === 4 ? 50 : 20;
+          list.push({ kind: 'folge', value, n: len, top: rs[j], suit: s, trump: isTrumpMode(m) && s === m,
+            label: len + 'er-Folge ' + SUITS[s] + ' bis ' + RANKS[rs[j]] });
+        }
+        i = j + 1;
+      }
+    }
+    return list;
+  }
+  // > 0 wenn Weis a besser als b
+  function compareWeis(a, b) {
+    if (a.value !== b.value) return a.value - b.value;
+    if (a.n !== b.n) return a.n - b.n;
+    if (a.top !== b.top) return a.top - b.top;
+    if (a.trump !== b.trump) return a.trump ? 1 : -1;
+    return 0;
+  }
+  function bestWeis(list) {
+    let best = null;
+    for (const w of list) if (!best || compareWeis(w, best) > 0) best = w;
+    return best;
+  }
+  // Ermittelt, welches Team Weis erhält. order = Spielreihenfolge im 1. Stich
+  function resolveWeis(hands, m, order) {
+    const perPlayer = hands.map(h => weisOfHand(h, m));
+    let bestP = -1, bestW = null;
+    for (const p of order) {
+      const w = bestWeis(perPlayer[p]);
+      if (w && (!bestW || compareWeis(w, bestW) > 0)) { bestW = w; bestP = p; }
+    }
+    const pts = [0, 0];
+    let winnerTeam = -1;
+    if (bestP >= 0) {
+      winnerTeam = team(bestP);
+      for (let p = 0; p < 4; p++) if (team(p) === winnerTeam) pts[winnerTeam] += perPlayer[p].reduce((a, w) => a + w.value, 0);
+    }
+    return { perPlayer, winnerTeam, pts };
+  }
+
+  // ---------- Stöck (spec §8) ----------
+  function stoeckHolder(hands, m) {
+    if (!isTrumpMode(m)) return -1;
+    for (let p = 0; p < 4; p++) if (hands[p].includes(makeCard(m, RK)) && hands[p].includes(makeCard(m, RO))) return p;
+    return -1;
+  }
+
+  // ---------- Hilfsfunktionen ----------
+  function shuffle(a, rnd) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function sortHand(hand, m) {
+    const suitOrder = [0, 1, 2, 3];
+    return hand.slice().sort((a, b) => {
+      const sa = suitOf(a), sb = suitOf(b);
+      const ka = isTrump(a, m) ? -1 : suitOrder.indexOf(sa), kb = isTrump(b, m) ? -1 : suitOrder.indexOf(sb);
+      if (ka !== kb) return ka - kb;
+      if (isTrump(a, m)) return trumpStrength(b) - trumpStrength(a);
+      return plainStrength(b, m === undefined ? OBENABE : m) - plainStrength(a, m === undefined ? OBENABE : m);
+    });
+  }
+
+  // ---------- Spielzustand ----------
+  class Game {
+    constructor(opts) {
+      opts = opts || {};
+      this.rnd = opts.rnd || Math.random;
+      this.target = opts.target || TARGET;
+      this.scores = [0, 0];
+      if (opts.dealer !== undefined && !(Number.isInteger(opts.dealer) && opts.dealer >= 0 && opts.dealer <= 3)) throw new Error('Ungültiger Geber');
+      this.dealer = opts.dealer !== undefined ? opts.dealer : Math.floor(this.rnd() * 4);
+      this.handNo = 0;
+      this.log = [];
+      this.history = []; // abgeschlossene Spiele
+      this.startHand();
+    }
+
+    startHand(deckOverride) {
+      this.dealer = this.handNo === 0 ? this.dealer : nextP(this.dealer);
+      this.handNo++;
+      const deck = deckOverride ? deckOverride.slice() : shuffle([...Array(36).keys()], this.rnd);
+      this.hands = [0, 1, 2, 3].map(i => deck.slice(i * 9, i * 9 + 9));
+      this.initialHands = this.hands.map(h => h.slice());
+      this.phase = 'bidding';
+      this.turn = nextP(this.dealer);
+      this.highBid = null;       // {p, amount, mode}
+      this.passesInRow = 0;
+      this.kontra = false;
+      this.kontraBy = -1;
+      this.kontraQueue = [];     // Gegner, die im Kontra-Fenster gefragt werden
+      this.kontraAllowedFor = -1; // Spieler, der beim regulären Zug noch Kontra sagen darf
+      this.bidLog = [];
+      this.trick = [];
+      this.tricks = [];          // [{cards:[{p,c}], winner}]
+      this.won = [[], []];       // Karten pro Team
+      this.tricksPerTeam = [0, 0];
+      this.lastHand = null;
+      // Werte des vorherigen Spiels zurücksetzen (Review-Fund)
+      this.mode = undefined;
+      this.declarer = undefined;
+      this.bid = undefined;
+      this.weis = null;
+      this.stoeck = -1;
+      this.redealt = false;
+    }
+
+    // ----- Reizen -----
+    minBid() {
+      if (!this.highBid) return 40;
+      const i = BID_LEVELS.indexOf(this.highBid.amount);
+      return i + 1 < BID_LEVELS.length ? BID_LEVELS[i + 1] : null;
+    }
+    allowedBids() {
+      const min = this.minBid();
+      return min === null ? [] : BID_LEVELS.filter(b => b >= min);
+    }
+    canKontra(p) {
+      if (!this.highBid || team(p) === team(this.highBid.p)) return false;
+      if (this.phase === 'kontra') return this.kontraQueue[0] === p;
+      return this.phase === 'bidding' && this.turn === p && this.kontraAllowedFor === p;
+    }
+
+    act(p, action) {
+      if (this.phase === 'kontra') return this._actKontraWindow(p, action);
+      if (this.phase === 'direction') return this._actDirection(p, action);
+      if (this.phase !== 'bidding') throw new Error('Nicht in der Reizphase');
+      if (p !== this.turn) throw new Error('Nicht am Zug: ' + p);
+      if (action.type === 'pass') {
+        this.bidLog.push({ p, type: 'pass' });
+        this.kontraAllowedFor = -1;
+        this.passesInRow++;
+        if (!this.highBid && this.passesInRow === 4) { this._redeal(); return; }
+        if (this.highBid && this.passesInRow === 3) { this._startPlay(); return; }
+        this.turn = nextP(p);
+        return;
+      }
+      if (action.type === 'kontra') {
+        if (!this.canKontra(p)) throw new Error('Kontra nicht erlaubt');
+        this._applyKontra(p);
+        return;
+      }
+      if (action.type === 'bid') {
+        const allowed = this.allowedBids();
+        if (!allowed.includes(action.amount)) throw new Error('Ungültige Gebotshöhe ' + action.amount);
+        if (!BID_MODES.includes(action.mode)) throw new Error('Ungültiger Modus');
+        this.highBid = { p, amount: action.amount, mode: action.mode };
+        this.bidLog.push({ p, type: 'bid', amount: action.amount, mode: action.mode });
+        this.passesInRow = 0;
+        this.kontraAllowedFor = -1;
+        // Kontra-Fenster: beide Gegner werden gefragt (zuerst Sitz p+3, dann p+1)
+        this.kontraQueue = [(p + 3) % 4, nextP(p)];
+        this.phase = 'kontra';
+        this.turn = this.kontraQueue[0];
+        return;
+      }
+      throw new Error('Unbekannte Aktion');
+    }
+
+    _actKontraWindow(p, action) {
+      if (p !== this.kontraQueue[0]) throw new Error('Nicht am Zug (Kontra-Fenster): ' + p);
+      if (action.type === 'kontra') { this._applyKontra(p); return; }
+      if (action.type !== 'noKontra') throw new Error('Im Kontra-Fenster nur kontra/noKontra');
+      this.kontraQueue.shift();
+      if (this.kontraQueue.length) { this.turn = this.kontraQueue[0]; return; }
+      if (this.highBid.amount === 257) { this._startPlay(); return; }
+      this.phase = 'bidding';
+      this.turn = nextP(this.highBid.p);
+      this.kontraAllowedFor = -1; // Kontra nur im Fenster
+    }
+
+    _applyKontra(p) {
+      this.kontra = true;
+      this.kontraBy = p;
+      this.bidLog.push({ p, type: 'kontra' });
+      this._startPlay();
+    }
+
+    _redeal() {
+      this.log.push('Alle haben gepasst – neu geben.');
+      this.redealt = true;
+      this.startHand();
+    }
+
+    _startPlay() {
+      const hb = this.highBid;
+      this.declarer = hb.p;
+      this.mode = hb.mode;
+      this.bid = hb.amount;
+      this.kontraQueue = [];
+      this.kontraAllowedFor = -1;
+      if (isOpenDirection(hb.mode)) {      // Slalom/Quer: zuerst die Startrichtung wählen
+        this.phase = 'direction';
+        this.turn = this.declarer;
+        return;
+      }
+      this._beginPlay();
+    }
+
+    _actDirection(p, action) {
+      if (p !== this.turn) throw new Error('Nicht am Zug: ' + p);
+      if (action.type !== 'direction' || (action.dir !== 'oben' && action.dir !== 'unten')) throw new Error('Richtung wählen: oben/unten');
+      this.mode = this.highBid.mode + (action.dir === 'unten' ? 1 : 0);
+      this._beginPlay();
+    }
+
+    _beginPlay() {
+      this.phase = 'play';
+      this.turn = this.declarer;
+      this.kontraQueue = [];
+      this.kontraAllowedFor = -1;
+      const order = [0, 1, 2, 3].map(i => (this.declarer + i) % 4);
+      this.weis = resolveWeis(this.hands, this.mode, order);
+      this.stoeck = stoeckHolder(this.hands, this.mode);
+    }
+
+    // ----- Spielen -----
+    currentTrickMode() { return trickMode(this.mode, this.tricks.length); }
+    legal(p) {
+      if (this.phase !== 'play' || p !== this.turn) return [];
+      return legalMoves(this.hands[p], this.trick, this.mode);
+    }
+
+    play(p, c) {
+      if (this.phase !== 'play') throw new Error('Nicht in der Spielphase');
+      if (p !== this.turn) throw new Error('Nicht am Zug: ' + p);
+      if (!this.legal(p).includes(c)) throw new Error('Illegaler Zug: ' + cardName(c));
+      this.hands[p] = this.hands[p].filter(x => x !== c);
+      this.trick.push({ p, c });
+      const ev = { played: { p, c } };
+      if (this.trick.length < 4) { this.turn = nextP(p); return ev; }
+      const wi = trickWinnerIndex(this.trick, trickMode(this.mode, this.tricks.length));
+      const winner = this.trick[wi].p;
+      const t = team(winner);
+      for (const x of this.trick) this.won[t].push(x.c);
+      this.tricksPerTeam[t]++;
+      this.tricks.push({ cards: this.trick, winner });
+      ev.trickComplete = { cards: this.trick, winner };
+      this.trick = [];
+      this.turn = winner;
+      if (this.tricks.length === 9) ev.handOver = this._scoreHand(winner);
+      return ev;
+    }
+
+    _scoreHand(lastWinner) {
+      const m = this.mode;
+      const cardPts = [0, 1].map(t => this.won[t].reduce((a, c) => a + points(c, m), 0));
+      cardPts[team(lastWinner)] += 5;
+      let match = -1;
+      for (const t of [0, 1]) if (this.tricksPerTeam[t] === 9) { cardPts[t] += 100; match = t; }
+      const bt = team(this.declarer);
+      const made = cardPts[bt] >= this.bid;
+      const bonus = this.bid * (this.kontra ? 2 : 1);
+      const stoeckPts = [0, 0];
+      if (this.stoeck >= 0) stoeckPts[team(this.stoeck)] = 20;
+      const mult = MULT[m];
+      const total = [0, 1].map(t => mult * (cardPts[t] + this.weis.pts[t] + stoeckPts[t]));
+      if (made) total[bt] += bonus; else total[1 - bt] += bonus;
+      this.scores[0] += total[0];
+      this.scores[1] += total[1];
+      const res = {
+        declarer: this.declarer, mode: m, mult, bid: this.bid, kontra: this.kontra, made, match,
+        cardPts, weisPts: this.weis.pts.slice(), stoeckPts, bonus, total, scores: this.scores.slice()
+      };
+      this.lastHand = res;
+      this.history.push(res);
+      if (this.scores[0] >= this.target || this.scores[1] >= this.target) {
+        if (this.scores[0] !== this.scores[1]) {
+          this.phase = 'gameOver';
+          const w = this.scores[0] > this.scores[1] ? 0 : 1;
+          res.gameWinner = w;
+          res.doppel = this.scores[1 - w] < this.target / 2;
+          return res;
+        }
+      }
+      this.phase = 'handOver';
+      return res;
+    }
+
+    nextHand() {
+      if (this.phase !== 'handOver') throw new Error('Spiel nicht beendet');
+      this.startHand();
+    }
+  }
+
+  const api = {
+    BID_MODES, bidModeName, isOpenDirection, MULT, SUITS, RANKS, MODES, BID_LEVELS, OBENABE, UNDENUFE, SLALOM_OBEN, SLALOM_UNTEN, QUER_OBEN, QUER_UNTEN, NUM_MODES, TARGET,
+    startDir, trickMode, pointsMode,
+    R6, R7, R8, R9, RB, RU, RO, RK, RA,
+    suitOf, rankOf, makeCard, isTrumpMode, isTrump, team, nextP, cardName,
+    points, trumpStrength, plainStrength, beats, trickWinnerIndex, legalMoves,
+    weisOfHand, compareWeis, bestWeis, resolveWeis, stoeckHolder, shuffle, sortHand, Game
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.Jass = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>/* Sidi Barrani – KI-Spieler. Nutzt nur die öffentliche Engine-API. */
+(function (root) {
+  'use strict';
+  const J = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.Jass;
+  const { suitOf, rankOf, isTrump, isTrumpMode, team, trumpStrength, plainStrength, legalMoves, trickWinnerIndex, BID_LEVELS, RU, R9, RA, R6 } = J;
+
+  // ---------- Spielarten mit wechselnder Richtung (Slalom, Quer) ----------
+  // m in den Funktionen unten = Richtung des aktuellen Stichs (für Rang und Bock).
+  // Die Kartenwerte hängen dagegen vom ganzen Spiel ab (Startrichtung): PM hält den «Punkte-Modus».
+  let PM = null;
+  function points(c, m) { return J.points(c, PM !== null ? PM : m); }
+  function effMode(game) { return J.trickMode(game.mode, game.tricks.length); }
+
+  // ---------- schnelle Ausspiel-Heuristik (für Simulationen) ----------
+  function strength(c, m) { return isTrump(c, m) ? 100 + trumpStrength(c) : plainStrength(c, m); }
+
+  function rolloutChoice(p, hand, trick, m, declTeam) {
+    const lm = legalMoves(hand, trick, m);
+    if (lm.length === 1) return lm[0];
+    if (trick.length === 0) {
+      // Bieter-Team zieht Trümpfe, sonst sichere Asse/hohe Karten, sonst tiefste Karte
+      if (isTrumpMode(m) && team(p) === declTeam) {
+        const tr = lm.filter(c => isTrump(c, m));
+        if (tr.length >= 2) return tr.reduce((a, b) => (trumpStrength(b) > trumpStrength(a) ? b : a));
+      }
+      const tops = lm.filter(c => !isTrump(c, m) && plainStrength(c, m) === 8);
+      if (tops.length) return tops[0];
+      return lm.reduce((a, b) => (points(b, m) < points(a, m) || (points(b, m) === points(a, m) && strength(b, m) < strength(a, m)) ? b : a));
+    }
+    const wi = trickWinnerIndex(trick, m);
+    const winner = trick[wi].p;
+    const partnerWins = team(winner) === team(p);
+    const led = suitOf(trick[0].c);
+    const winsWith = c => {
+      const t2 = trick.concat([{ p, c }]);
+      return trickWinnerIndex(t2, m) === t2.length - 1;
+    };
+    if (partnerWins && (trick.length === 3 || strength(trick[wi].c, m) >= (isTrump(trick[wi].c, m) ? 106 : 7))) {
+      // Schmieren: Punkte geben, aber keine wertvollen Trümpfe
+      const cand = lm.filter(c => !(isTrump(c, m) && trumpStrength(c) >= 6));
+      const pool = cand.length ? cand : lm;
+      return pool.reduce((a, b) => (points(b, m) > points(a, m) ? b : a));
+    }
+    const winning = lm.filter(winsWith);
+    if (winning.length) {
+      const trickPts = trick.reduce((a, x) => a + points(x.c, m), 0);
+      const cheapest = winning.reduce((a, b) => (strength(b, m) < strength(a, m) ? b : a));
+      if (!isTrump(cheapest, m) || trickPts >= 10 || trick.length === 3 || suitOf(cheapest) === led) return cheapest;
+    }
+    return lm.reduce((a, b) => (points(b, m) < points(a, m) || (points(b, m) === points(a, m) && strength(b, m) < strength(a, m)) ? b : a));
+  }
+
+  // Spielt eine Hand von einem Zwischenzustand bis zum Ende. Gibt Kartenpunkte je Team zurück.
+  function playout(hands, trick, turn, M, declTeam, wonPts, tricksTeam, firstChoice) {
+    const prevPM = PM; PM = J.pointsMode(M);
+    hands = hands.map(h => h.slice());
+    trick = trick.slice();
+    let pts = wonPts.slice(), tt = tricksTeam.slice();
+    let p = turn, first = true, tricksDone = tt[0] + tt[1];
+    while (tricksDone < 9) {
+      const m = J.trickMode(M, tricksDone);
+      const c = first && firstChoice !== undefined ? firstChoice : rolloutChoice(p, hands[p], trick, m, declTeam);
+      first = false;
+      hands[p] = hands[p].filter(x => x !== c);
+      trick.push({ p, c });
+      if (trick.length < 4) { p = (p + 1) % 4; continue; }
+      const w = trick[trickWinnerIndex(trick, m)].p;
+      const t = team(w);
+      pts[t] += trick.reduce((a, x) => a + points(x.c, m), 0);
+      tt[t]++; tricksDone++;
+      if (tricksDone === 9) pts[t] += 5;
+      trick = []; p = w;
+    }
+    for (const t of [0, 1]) if (tt[t] === 9) pts[t] += 100;
+    PM = prevPM;
+    return pts;
+  }
+
+  // ---------- Wissen über verdeckte Karten ----------
+  function knowledge(game, me) {
+    const m = effMode(game);
+    const played = new Set();
+    const voids = [0, 1, 2, 3].map(() => new Set());
+    const allTricks = game.tricks.map(t => t.cards).concat(game.trick.length ? [game.trick] : []);
+    for (const tr of allTricks) {
+      const led = suitOf(tr[0].c);
+      for (const { p, c } of tr) {
+        played.add(c);
+        if (suitOf(c) === led) continue;
+        if (isTrumpMode(m) && led === m) voids[p].add('T'); // kein Trumpf (ausser evtl. Puur)
+        else if (!(isTrumpMode(m) && suitOf(c) === m)) voids[p].add(led);
+      }
+    }
+    const unknown = [];
+    for (let c = 0; c < 36; c++) if (!played.has(c) && !game.hands[me].includes(c)) unknown.push(c);
+    return { unknown, voids };
+  }
+
+  function canHold(p, c, voids, m) {
+    const v = voids[p];
+    if (v.has(suitOf(c)) && !(isTrumpMode(m) && suitOf(c) === m)) return false;
+    if (isTrumpMode(m) && suitOf(c) === m) {
+      if (v.has(m)) return false;
+      if (v.has('T') && rankOf(c) !== RU) return false;
+    }
+    return true;
+  }
+
+  function sampleHands(game, me, kn, rnd) {
+    const m = effMode(game);
+    const counts = [0, 1, 2, 3].map(p => game.hands[p].length);
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const pool = J.shuffle(kn.unknown.slice(), rnd);
+      const hands = [[], [], [], []];
+      hands[me] = game.hands[me].slice();
+      // eingeschränkte Karten zuerst verteilen
+      pool.sort((a, b) => holders(a) - holders(b));
+      let ok = true;
+      for (const c of pool) {
+        const opts = [0, 1, 2, 3].filter(p => p !== me && hands[p].length < counts[p] && canHold(p, c, kn.voids, m));
+        if (!opts.length) { ok = false; break; }
+        hands[opts[Math.floor(rnd() * opts.length)]].push(c);
+      }
+      if (ok) return hands;
+    }
+    // Rückfall: ohne Einschränkungen
+    const pool = J.shuffle(kn.unknown.slice(), rnd);
+    const hands = [[], [], [], []];
+    hands[me] = game.hands[me].slice();
+    let i = 0;
+    for (let p = 0; p < 4; p++) if (p !== me) while (hands[p].length < counts[p]) hands[p].push(pool[i++]);
+    return hands;
+    function holders(c) { return [0, 1, 2, 3].filter(p => p !== me && canHold(p, c, kn.voids, m)).length; }
+  }
+
+  // ---------- Kartenwahl ----------
+  function chooseCard(game, me, opts) {
+    opts = opts || {};
+    const rnd = opts.rnd || Math.random;
+    const samples = opts.samples || 40;
+    const lm = game.legal(me);
+    if (lm.length === 1) return lm[0];
+    const prevPM = PM; PM = J.pointsMode(game.mode);
+    try { return chooseCardInner(game, me, opts, rnd, samples, lm); } finally { PM = prevPM; }
+  }
+
+  // Angeben (Spiele ohne Trumpf, nur erster Stich): Spielt mein Partner den Bock einer Farbe aus
+  // (Obenabe: Ass, Undenufe: 6) und ich habe die nächste Karte (König bzw. 7), gebe ich sie an.
+  // So weiss der Ausspielende, dass seine folgende Karte (z.B. der Ober) jetzt der Bock ist.
+  function angeben(game, me, lm) {
+    if (isTrumpMode(game.mode) || game.tricks.length !== 0 || game.trick.length === 0) return null;
+    const lead = game.trick[0];
+    if (lead.p !== (me + 2) % 4) return null;
+    const m = effMode(game), s = suitOf(lead.c);
+    const order = [];
+    for (let r = 0; r < 9; r++) order.push(J.makeCard(s, r));
+    order.sort((a, b) => strength(b, m) - strength(a, m)); // stärkste zuerst
+    if (order[0] !== lead.c) return null;                 // nur wenn der Partner den Bock ausspielt
+    return lm.includes(order[1]) ? order[1] : null;
+  }
+
+  function chooseCardInner(game, me, opts, rnd, samples, lm) {
+    if (opts.conventions !== false) {
+      const a = angeben(game, me, lm);
+      if (a !== null) { api._lastRule = 'Angeben'; return a; }
+    }
+    const m = effMode(game), declTeam = team(game.declarer), myTeam = team(me);
+    const wonPts = [0, 1].map(t => game.won[t].reduce((a, c) => a + points(c, m), 0));
+    const kn = knowledge(game, me);
+    const bonus = game.bid * (game.kontra ? 2 : 1);
+    const score = new Map(lm.map(c => [c, 0]));
+    for (let s = 0; s < samples; s++) {
+      const hands = sampleHands(game, me, kn, rnd);
+      for (const c of lm) {
+        const pts = playout(hands, game.trick, me, game.mode, declTeam, wonPts, game.tricksPerTeam, c);
+        const made = pts[declTeam] >= game.bid;
+        // Faktor gilt für Kartenpunkte, nicht fürs Gebot. Gerechnet wird in einfachen Kartenpunkten
+        // (Gebot durch den Faktor geteilt), damit die Toleranzen der Jass-Regeln gleich bleiben.
+        let u = pts[myTeam] - pts[1 - myTeam];
+        u += ((made === (myTeam === declTeam)) ? bonus : -bonus) / J.MULT[game.mode];
+        score.set(c, score.get(c) + u);
+      }
+    }
+    // Durchschnittlicher Nutzen pro Karte (Einheit: Punktdifferenz Team – Gegner)
+    const avg = new Map(lm.map(c => [c, score.get(c) / samples]));
+    const leading = game.trick.length === 0;
+    const sig = signals(game);
+    const partner = (me + 2) % 4;
+
+    const conv = opts.conventions !== false;
+    if (leading && conv) {
+      // Konvention: Verwirft der Partner eine Farbe, will er sie nicht. Spiele ihm eine andere an.
+      const disc = sig.discards[partner];
+      if (disc.size) {
+        for (const c of lm) {
+          if (isTrump(c, m)) continue;
+          avg.set(c, avg.get(c) + (disc.has(suitOf(c)) ? -SIGNAL_AVOID : SIGNAL_PREFER));
+        }
+      }
+    } else if (conv) {
+      // Eigenes Verwerfen als Signal: nicht von der Farbe verwerfen, in der ich den Bock halte
+      const led = suitOf(game.trick[0].c);
+      for (const c of lm) {
+        if (suitOf(c) === led || isTrump(c, m)) continue;
+        avg.set(c, avg.get(c) + (holdsBock(game, me, suitOf(c)) ? -DISCARD_KEEP : DISCARD_OK));
+      }
+    }
+
+    let best = lm[0];
+    for (const c of lm) if (avg.get(c) > avg.get(best)) best = c;
+
+    if (leading && conv) {
+      // 0. Kontrolle behalten: Böcke zuerst ausspielen (oberste Karte einer Folge)
+      api._pullTrump = false;
+      const cash = bockToCash(game, me, lm, avg);
+      if (cash !== null) {
+        if (api._pullTrump) { api._lastRule = 'Nachtrumpfen'; return cash; }
+        api._lastRule = 'Bock zuerst'; return topOfRun(game, me, cash);
+      }
+      // 1. Partner hat eine Farbe angezogen: erst eigene Böcke spielen, dann die Farbe zurückspielen
+      const anz = anziehAnswer(game, me, lm, avg);
+      if (anz !== null) { api._lastRule = 'Anziehen-Antwort'; return anz; }
+      // 2. Auf ein neues Verwerf-Signal des Partners antworte ich beim nächsten Anspiel
+      const answer = signalAnswer(game, me, lm);
+      if (answer !== null) { api._lastRule = 'Verwerf-Antwort'; return answer; }
+      // 3. Ohne Bock selbst eine Farbe anziehen (klein anspielen, um einen Bock zu erspielen)
+      const own = selfAnziehen(game, me, lm, avg, best);
+      if (own !== null) { api._lastRule = 'Selbst anziehen'; return own; }
+      api._lastRule = 'Simulation';
+    }
+
+    if (!leading && conv) {
+      // Partner hat angezogen (klein angespielt) und ich halte den Bock: Stich nehmen, ausser der Partner gewinnt ihn sicher
+      const lead = game.trick[0], ls = suitOf(lead.c);
+      if (lead.p === (me + 2) % 4 && !isTrump(lead.c, m)) {
+        const myBock = lm.find(c => suitOf(c) === ls && holdsBockCard(game, me, c));
+        const wi0 = trickWinnerIndex(game.trick, m);
+        const partnerSafe = game.trick[wi0].p === lead.p && game.trick.length === 3;
+        const leadWasBock = holdsBockCardFor(game, lead.c);
+        if (myBock !== undefined && !leadWasBock && !partnerSafe) {
+          const t2 = game.trick.concat([{ p: me, c: myBock }]);
+          if (trickWinnerIndex(t2, m) === t2.length - 1) return myBock;
+        }
+      }
+    }
+
+    if (!leading && conv) {
+      // Abwerfen/Zugeben ohne Stich: von fast gleichwertigen Karten die punktärmste und schwächste abgeben
+      const wi = trickWinnerIndex(game.trick, m);
+      const partnerWinning = team(game.trick[wi].p) === myTeam;
+      const winsWith = c => { const t2 = game.trick.concat([{ p: me, c }]); return trickWinnerIndex(t2, m) === t2.length - 1; };
+      if (!partnerWinning && !winsWith(best)) {
+        // Feste Regel: Den Gegnern nichts schenken. Unter den Karten, die den Stich nicht holen:
+        // 1. Trümpfe und Böcke behalten, 2. möglichst wenig Punkte, 3. aus einer Farbe ohne eigenen Bock
+        //    (Verwerf-Signal), 4. die schwächste Karte.
+        const free = lm.filter(c => !winsWith(c));
+        const keep = c => isTrump(c, m) || inTopRun(game, me, c);
+        const key = c => [keep(c) ? 1 : 0, points(c, m), holdsBock(game, me, suitOf(c)) ? 1 : 0, strength(c, m)];
+        const less = (a, b) => { const ka = key(a), kb = key(b); for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] < kb[i]; return false; };
+        best = free.reduce((a, b) => (less(b, a) ? b : a));
+      }
+    }
+
+    if (leading && conv && !holdsBockCard(game, me, best) && points(best, m) >= 10) {
+      // Kein Banner/Ass anspielen, das kein Bock ist: es schenkt dem Gegner die Punkte
+      const cheaper = lm.filter(c => !holdsBockCard(game, me, c) && points(c, m) < 10 && avg.get(best) - avg.get(c) <= GIFT_TOLERANCE);
+      if (cheaper.length) {
+        best = cheaper.reduce((a, b) => (avg.get(b) > avg.get(a) ? b : a));
+        api._lastRule = 'Keine Punkte verschenken';
+      }
+    }
+
+    if (leading && conv) {
+      // Konvention: mit der stärksten Karte anspielen, wenn die Simulation kaum Unterschied sieht
+      // «Stärkste Karte» = ein Bock (höchste noch offene Karte seiner Farbe). Trumpf-Böcke nur im Bieter-Team.
+      const close = lm.filter(c => avg.get(best) - avg.get(c) <= LEAD_TOLERANCE);
+      const bocks = close.filter(c => holdsBockCard(game, me, c) && (!isTrump(c, m) || myTeam === declTeam));
+      if (bocks.length && !holdsBockCard(game, me, best)) {
+        best = bocks.reduce((a, b) => (avg.get(b) > avg.get(a) ? b : a));
+      }
+      // Von gleichwertigen Folgekarten immer die oberste (z.B. 9 vor 6 bei 6-7-8-9)
+      best = topOfRun(game, me, best);
+    }
+    return best;
+  }
+
+  const SIGNAL_AVOID = 24, SIGNAL_PREFER = 12, DISCARD_KEEP = 14, DISCARD_OK = 4, LEAD_TOLERANCE = 8, DUMP_TOLERANCE = 10;
+
+  // ---------- Böcke zuerst ----------
+  // Bieter-Team im Trumpfspiel: erst Trümpfe ziehen (mit Trumpf-Bock), solange die Gegner noch Trumpf haben können.
+  // Danach Nicht-Trumpf-Böcke, ausser ein Gegner ist dort blank und könnte trumpfen.
+  function bockToCash(game, me, lm, avg) {
+    const m = effMode(game), myTeam = team(me), declTeam = team(game.declarer);
+    const kn = knowledge(game, me), opp = [(me + 1) % 4, (me + 3) % 4];
+    if (isTrumpMode(m) && myTeam === declTeam) {
+      const oppMayHaveTrump = opp.some(p => !kn.voids[p].has('T') && !kn.voids[p].has(m)) &&
+        kn.unknown.some(c => suitOf(c) === m);
+      const tb = lm.filter(c => isTrump(c, m) && holdsBockCard(game, me, c));
+      if (oppMayHaveTrump && tb.length) return tb[0];
+      // Nachtrumpfen: Mit vielen Trümpfen weiter Trumpf spielen, bis die Gegner keine mehr haben.
+      // Ohne Trumpf-Bock mit dem kleinsten Trumpf, damit Puur/Näll der Gegner herauskommen.
+      const mine = lm.filter(c => isTrump(c, m));
+      const outstanding = kn.unknown.filter(c => suitOf(c) === m).length;
+      if (oppMayHaveTrump && (mine.length >= 3 || (mine.length >= 2 && mine.length >= outstanding))) {
+        // Billigster Trumpf: zuerst wenig Punkte (6/7/8 vor Ober vor König vor Banner), dann tiefer Rang
+        const cheap = mine.reduce((a, b) => {
+          const pa = points(a, m), pb = points(b, m);
+          if (pa !== pb) return pb < pa ? b : a;
+          return trumpStrength(b) < trumpStrength(a) ? b : a;
+        });
+        // Nur nachtrumpfen, wenn das wenig kostet; Banner, Ass oder Näll nicht in einen höheren Trumpf werfen
+        if (points(cheap, m) <= 4) { api._pullTrump = true; return cheap; }
+      }
+    }
+    const safe = c => !isTrumpMode(m) || !opp.some(p => kn.voids[p].has(suitOf(c)) && !kn.voids[p].has('T'));
+    const bocks = lm.filter(c => !isTrump(c, m) && holdsBockCard(game, me, c) && safe(c));
+    if (!bocks.length) return null;
+    return bocks.reduce((a, b) => (avg.get(b) > avg.get(a) ? b : a));
+  }
+
+  // ---------- Anziehen ----------
+  // Farben, die der Partner mit einer Nicht-Bock-Karte angespielt hat und die ich noch nicht zurückgespielt habe
+  function anzugSuits(game, me) {
+    const m = effMode(game), partner = (me + 2) % 4;
+    const played = new Set(), anz = new Map(), voidsP = new Set();
+    game.tricks.forEach((t, i) => {
+      const lead = t.cards[0], s0 = suitOf(lead.c);
+      if (lead.p === partner && !isTrump(lead.c, m)) {
+        let bock = true;
+        for (let r = 0; r < 9; r++) {
+          const x = J.makeCard(s0, r);
+          if (x !== lead.c && !played.has(x) && strength(x, m) > strength(lead.c, m)) { bock = false; break; }
+        }
+        if (!bock && !anz.has(s0)) anz.set(s0, i);
+      }
+      if (lead.p === me && anz.has(s0)) anz.delete(s0); // zurückgespielt
+      for (const { p, c } of t.cards) { played.add(c); if (p === partner && suitOf(c) !== s0) voidsP.add(s0); }
+    });
+    const disc = signals(game).discards[partner];
+    return [...anz.keys()].filter(s => !voidsP.has(s) && !disc.has(s));
+  }
+
+  function anziehAnswer(game, me, lm, avg) {
+    const m = effMode(game);
+    const suits = anzugSuits(game, me);
+    const want = lm.filter(c => suits.includes(suitOf(c)));
+    if (!want.length) return null;
+    // Zuerst eigene Böcke (Nicht-Trumpf), sofern kein Gegner die Farbe abstechen kann
+    const kn = knowledge(game, me), opp = [(me + 1) % 4, (me + 3) % 4];
+    const safe = c => !isTrumpMode(m) || !opp.some(p => kn.voids[p].has(suitOf(c)) && !kn.voids[p].has('T'));
+    const bocks = lm.filter(c => !isTrump(c, m) && holdsBockCard(game, me, c) && safe(c));
+    if (bocks.length) return bocks.reduce((a, b) => (avg.get(b) > avg.get(a) ? b : a));
+    // Dann die angezogene Farbe zurück: tiefste Karte
+    return want.reduce((a, b) => (points(b, m) !== points(a, m) ? (points(b, m) < points(a, m) ? b : a) : (strength(b, m) < strength(a, m) ? b : a)));
+  }
+
+  function selfAnziehen(game, me, lm, avg, best) {
+    const m = effMode(game);
+    if (isTrump(best, m) || holdsBockCard(game, me, best)) return null;
+    if (lm.some(c => !isTrump(c, m) && holdsBockCard(game, me, c))) return null;
+    const partner = (me + 2) % 4;
+    const disc = signals(game).discards[partner];
+    const kn = knowledge(game, me);
+    const played = playedSet(game);
+    const bySuit = {};
+    for (const c of lm) {
+      const s = suitOf(c);
+      if (isTrump(c, m) || disc.has(s) || kn.voids[partner].has(s)) continue;
+      (bySuit[s] = bySuit[s] || []).push(c);
+    }
+    let bestSuit = -1, bestScore = -1;
+    for (const s of Object.keys(bySuit).map(Number)) {
+      const cs = bySuit[s];
+      const myTop = cs.reduce((a, b) => (strength(b, m) > strength(a, m) ? b : a));
+      let higher = 0;
+      for (let r = 0; r < 9; r++) {
+        const x = J.makeCard(s, r);
+        if (!played.has(x) && !game.hands[me].includes(x) && strength(x, m) > strength(myTop, m)) higher++;
+      }
+      // Am besten: nur eine fremde Karte über meiner höchsten -> nach dem Stich des Partners habe ich den Bock
+      const lowPts = Math.min(...cs.map(c => points(c, m)));
+      const score = (higher === 1 ? 100 : 0) + cs.length * 10 - higher - (lowPts >= 10 ? 200 : 0);
+      if (score > bestScore) { bestScore = score; bestSuit = s; }
+    }
+    if (bestSuit < 0) return null;
+    const low = bySuit[bestSuit].reduce((a, b) => (strength(b, m) < strength(a, m) ? b : a));
+    if (points(low, m) >= 10) return null; // nicht mit einem Banner anziehen
+    return avg.get(best) - avg.get(low) <= ANZ_TOLERANCE ? low : null;
+  }
+  const ANZ_TOLERANCE = 15, GIFT_TOLERANCE = 15;
+
+  // Antwort auf ein Verwerf-Signal: Hat der Partner seit meinem letzten Anspiel eine Farbe verworfen,
+  // spiele ich ihm eine Farbe an, die er nicht verworfen hat und noch bedienen kann (tiefste Karte).
+  function signalAnswer(game, me, lm) {
+    const m = effMode(game), partner = (me + 2) % 4;
+    let lastSignal = -1, lastMyLead = -1;
+    const voidsP = new Set();
+    game.tricks.forEach((t, i) => {
+      if (t.cards[0].p === me) lastMyLead = i;
+      const led = suitOf(t.cards[0].c);
+      for (const { p, c } of t.cards) {
+        if (p !== partner || suitOf(c) === led) continue;
+        voidsP.add(led);
+        if (!isTrump(c, m)) lastSignal = i;
+      }
+    });
+    if (lastSignal < 0 || lastMyLead > lastSignal) return null;
+    const disc = signals(game).discards[partner];
+    const wanted = lm.filter(c => !isTrump(c, m) && !disc.has(suitOf(c)) && !voidsP.has(suitOf(c)));
+    if (!wanted.length) return null;
+    // Farbe wählen, in der ich selbst am wenigsten Stärke habe (dort sitzt der Partner)
+    const bySuit = {};
+    for (const c of wanted) (bySuit[suitOf(c)] = bySuit[suitOf(c)] || []).push(c);
+    const suits = Object.keys(bySuit).map(Number);
+    suits.sort((a, b) => myTop(bySuit[a]) - myTop(bySuit[b]));
+    const pick = bySuit[suits[0]];
+    // Halte ich selbst den Bock dieser Farbe, spiele ihn; sonst klein anspielen
+    const bock = pick.find(c => holdsBockCard(game, me, c));
+    if (bock !== undefined) return bock;
+    return pick.reduce((a, b) => (points(b, m) !== points(a, m) ? (points(b, m) < points(a, m) ? b : a) : (strength(b, m) < strength(a, m) ? b : a)));
+    function myTop(cs) { return Math.max(...cs.map(c => strength(c, m))); }
+  }
+
+  // Verwerf-Signale: Wer eine Farbe nicht bedient und nicht trumpft, verwirft sie (= will sie nicht)
+  function signals(game) {
+    const m = effMode(game);
+    const discards = [0, 1, 2, 3].map(() => new Set());
+    const all = game.tricks.map(t => t.cards).concat(game.trick.length ? [game.trick] : []);
+    for (const tr of all) {
+      const led = suitOf(tr[0].c);
+      for (const { p, c } of tr) if (suitOf(c) !== led && !isTrump(c, m)) discards[p].add(suitOf(c));
+    }
+    return { discards };
+  }
+
+  function playedSet(game) {
+    const s = new Set();
+    for (const t of game.tricks) for (const x of t.cards) s.add(x.c);
+    for (const x of game.trick) s.add(x.c);
+    return s;
+  }
+
+  // Hält 'me' die stärkste noch nicht gespielte Karte der Farbe s?
+  function holdsBock(game, me, s) {
+    const m = effMode(game), played = playedSet(game);
+    let top = -1, topS = -1;
+    for (let r = 0; r < 9; r++) {
+      const c = J.makeCard(s, r);
+      if (played.has(c)) continue;
+      const st = strength(c, m);
+      if (st > topS) { topS = st; top = c; }
+    }
+    return top >= 0 && game.hands[me].includes(top);
+  }
+
+  // War die (bereits gespielte) Karte c zum Zeitpunkt ihres Ausspiels ein Bock?
+  function holdsBockCardFor(game, c) {
+    const m = effMode(game), s = suitOf(c), played = playedSet(game);
+    for (let r = 0; r < 9; r++) {
+      const x = J.makeCard(s, r);
+      if (x === c) continue;
+      // höhere Karte, die vor diesem Stich noch nicht gespielt war (inkl. Karten im laufenden Stich)
+      const inTrick = game.trick.some(t => t.c === x);
+      if ((!played.has(x) || inTrick) && strength(x, m) > strength(c, m)) return false;
+    }
+    return true;
+  }
+
+  // Gehört Karte c zu meiner Bock-Folge? (Alle stärkeren offenen Karten der Farbe liegen in meiner Hand)
+  function inTopRun(game, me, c) {
+    const m = effMode(game), s = suitOf(c), played = playedSet(game), hand = game.hands[me];
+    for (let r = 0; r < 9; r++) {
+      const x = J.makeCard(s, r);
+      if (x !== c && !played.has(x) && !hand.includes(x) && strength(x, m) > strength(c, m)) return false;
+    }
+    return true;
+  }
+
+  // Ist Karte c (in meiner Hand) der Bock ihrer Farbe?
+  function holdsBockCard(game, me, c) {
+    const m = effMode(game), s = suitOf(c), played = playedSet(game);
+    for (let r = 0; r < 9; r++) {
+      const x = J.makeCard(s, r);
+      if (x !== c && !played.has(x) && strength(x, m) > strength(c, m)) return false;
+    }
+    return true;
+  }
+
+  // Oberste Karte der lückenlosen Folge (nach Spielstärke, gespielte Karten zählen nicht als Lücke)
+  function topOfRun(game, me, c) {
+    const m = effMode(game), s = suitOf(c), played = playedSet(game), hand = game.hands[me];
+    const order = [];
+    for (let r = 0; r < 9; r++) {
+      const x = J.makeCard(s, r);
+      if (!played.has(x)) order.push(x);
+    }
+    order.sort((a, b) => strength(a, m) - strength(b, m));
+    let i = order.indexOf(c);
+    // Nach oben in der Folge nur, wenn die höhere Karte keine Punkte verschenkt (Banner/Ass nur als Bock)
+    while (i + 1 < order.length && hand.includes(order[i + 1]) &&
+           (points(order[i + 1], m) < 10 || holdsBockCard(game, me, order[i + 1]))) i++;
+    return order[i];
+  }
+
+  // ---------- Reizen ----------
+  // Erwartete Kartenpunkte des eigenen Teams, wenn ich mit Modus m ausspiele
+  // constraints: bisherige Gebote der anderen Spieler [{p, mode, amount}]. Die simulierten Hände werden so
+  // gezogen, dass sie zu diesen Geboten passen (wer «100 Schellen» sagt, hat auch Schellen-Trümpfe).
+  function evaluateModes(hand, me, rnd, n, constraints, only) {
+    n = n || 24;
+    constraints = constraints || [];
+    const rest = [];
+    for (let c = 0; c < 36; c++) if (!hand.includes(c)) rest.push(c);
+    const deal = () => {
+      let hands = null;
+      for (let tries = 0; tries < 40; tries++) {
+        const pool = J.shuffle(rest.slice(), rnd);
+        hands = [[], [], [], []];
+        let i = 0;
+        for (let p = 0; p < 4; p++) hands[p] = p === me ? hand.slice() : pool.slice(i, i += 9);
+        if (constraints.every(k => plausibleBidderHand(hands[k.p], k.mode, k.amount))) break;
+      }
+      return hands;
+    };
+    const res = [];
+    res.samples = [];
+    for (let m = 0; m < J.NUM_MODES; m++) {
+      let sum = 0;
+      const smp = [];
+      res.samples.push(smp);
+      if (only && !only.includes(m)) { res.push(0); continue; }
+      for (let k = 0; k < n; k++) {
+        const hands = deal();
+        const pts = playout(hands, [], me, m, team(me), [0, 0], [0, 0]);
+        sum += pts[team(me)];
+        smp.push(pts[team(me)]);
+      }
+      res.push(sum / n);
+    }
+    return res;
+  }
+
+  function trumpHolding(hand, m) {
+    if (isTrumpMode(m)) {
+      const tr = hand.filter(c => suitOf(c) === m);
+      return { puur: tr.some(c => rankOf(c) === RU), nell: tr.some(c => rankOf(c) === R9), n: tr.length };
+    }
+    const tops = hand.filter(c => plainStrength(c, m) === 8).length;
+    return { tops };
+  }
+
+  // Kontra nur, wenn meine eigene Hand die Gegner sehr wahrscheinlich unter ihr Gebot drückt.
+  // Ich zähle «sichere Stiche» (Böcke-Folgen von oben) und schätze deren Punkte (Kartenwert + ~10 pro Stich).
+  function sureDefense(hand, m) {
+    let pts = 0, tricks = 0;
+    const add = c => { pts += points(c, m) + 10; tricks++; };
+    for (let s = 0; s < 4; s++) {
+      const mine = hand.filter(c => suitOf(c) === s);
+      if (!mine.length) continue;
+      const order = [];
+      for (let r = 0; r < 9; r++) order.push(J.makeCard(s, r));
+      order.sort((a, b) => strength(b, m) - strength(a, m)); // stärkste zuerst
+      if (isTrumpMode(m) && s === m) {
+        let i = 0;
+        while (i < order.length && mine.includes(order[i])) { add(order[i]); i++; }
+        if (mine.length >= 4 && i < mine.length) tricks++; // langer Trumpf macht meist noch einen Stich
+      } else {
+        // Seitenfarbe: im Trumpfspiel ist nur ein Ass bei kurzer Farbe sicher, ohne Trumpf die ganze Folge von oben
+        if (isTrumpMode(m)) { if (mine.includes(order[0]) && mine.length <= 3) add(order[0]); }
+        else { let i = 0; while (i < order.length && mine.includes(order[i])) { add(order[i]); i++; } }
+      }
+    }
+    return { pts, tricks };
+  }
+
+  // Passt eine (simulierte) Bieterhand zum Gebot? Gleiche Mindestanforderungen, die die KI selbst beim Reizen nutzt.
+  // Ein gereiztes Spiel simulieren. Bei Slalom/Quer ist die Richtung noch offen: der Bieter nimmt die bessere.
+  function bidPlayout(hands, p, m) {
+    if (!J.isOpenDirection(m)) return playout(hands, [], p, m, team(p), [0, 0], [0, 0]);
+    const a = playout(hands, [], p, m, team(p), [0, 0], [0, 0]), b = playout(hands, [], p, m + 1, team(p), [0, 0], [0, 0]);
+    return a[team(p)] >= b[team(p)] ? a : b;
+  }
+
+  function plausibleBidderHand(hand, m, amount) {
+    const cnt = r => hand.filter(c => rankOf(c) === r).length;
+    if (m === J.OBENABE) return cnt(RA) >= 2 + (amount >= 100 ? 1 : 0);
+    if (m === J.UNDENUFE) return cnt(R6) >= 2 + (amount >= 100 ? 1 : 0);
+    if (m >= 6) return cnt(RA) >= 1 && cnt(R6) >= 1 && cnt(RA) + cnt(R6) >= 3 + (amount >= 100 ? 1 : 0);
+    const tr = hand.filter(c => suitOf(c) === m);
+    const top = tr.filter(c => rankOf(c) === RU || rankOf(c) === R9).length;
+    return top >= 1 && tr.length >= 3 + (amount >= 100 ? 1 : 0);
+  }
+
+  // Wahrscheinlichkeit, dass der Bieter sein Gebot verfehlt – aus Sicht von Spieler 'me' (nur eigene Hand bekannt)
+  function failProbability(game, me, hb, rnd, n) {
+    const known = game.hands[me];
+    const rest = [];
+    for (let c = 0; c < 36; c++) if (!known.includes(c)) rest.push(c);
+    let fails = 0, done = 0;
+    for (let k = 0; k < n; k++) {
+      let hands = null;
+      for (let tries = 0; tries < 40; tries++) {
+        const pool = J.shuffle(rest.slice(), rnd);
+        const hs = [[], [], [], []]; let i = 0;
+        for (let p = 0; p < 4; p++) hs[p] = p === me ? known.slice() : pool.slice(i, i += 9);
+        if (plausibleBidderHand(hs[hb.p], hb.mode, hb.amount)) { hands = hs; break; }
+      }
+      if (!hands) continue;
+      const pts = bidPlayout(hands, hb.p, hb.mode);
+      done++;
+      if (pts[team(hb.p)] < hb.amount) fails++;
+    }
+    return done ? fails / done : 0;
+  }
+
+  // Aussicht eines Gebots aus meiner Sicht: Scheiter-Wahrscheinlichkeit und mittlere Kartenpunkt-Differenz des Bieter-Teams
+  function bidOutlook(game, me, hb, rnd, n) {
+    const known = game.hands[me];
+    const rest = [];
+    for (let c = 0; c < 36; c++) if (!known.includes(c)) rest.push(c);
+    let fails = 0, done = 0, diff = 0;
+    for (let k = 0; k < n; k++) {
+      let hands = null;
+      for (let tries = 0; tries < 40; tries++) {
+        const pool = J.shuffle(rest.slice(), rnd);
+        const hs = [[], [], [], []]; let i = 0;
+        for (let p = 0; p < 4; p++) hs[p] = p === me ? known.slice() : pool.slice(i, i += 9);
+        if (plausibleBidderHand(hs[hb.p], hb.mode, hb.amount)) { hands = hs; break; }
+      }
+      if (!hands) continue;
+      const pts = bidPlayout(hands, hb.p, hb.mode);
+      done++;
+      if (pts[team(hb.p)] < hb.amount) fails++;
+      diff += pts[team(hb.p)] - pts[1 - team(hb.p)];
+    }
+    return done ? { pFail: fails / done, diff: diff / done } : { pFail: 0.5, diff: 0 };
+  }
+
+  function decideKontra(game, me, rnd) {
+    const hb = game.highBid;
+    if (!hb || team(hb.p) === team(me)) return false;  // nie auf das eigene Team
+    if (hb.amount < 60) return false;
+    return failProbability(game, me, hb, rnd || Math.random, 80) >= KONTRA_THRESHOLD;
+  }
+  const KONTRA_THRESHOLD = 0.8; // gemessen: ~79 % der Kontras richtig
+
+  const cache = new Map();
+  // Reizstil «mutig» (Ø Gebot ~109, ~58 % erfüllt, +24 Punkte/Spiel gegen den alten, vorsichtigen Stil).
+  // Taktik (v14): klein eröffnen und in kleinen Schritten steigern, das Maximum erst am Schluss
+  // (gemessen: +14 Punkte/Spiel gegen «gleich aufs Maximum»). openGap gross = Eröffnung mit dem kleinsten Gebot.
+  // swing: so viel schlechter darf die Partner-Spielart sein, damit ich trotzdem zu ihr schwenke.
+  // supportGap: so viel muss unser Team über dem Partner-Gebot schaffen, damit ich seine Spielart hochreize.
+  const BID = { margin: -6, openGap: 999, partnerGap: 15, swing: 12, supportGap: 10,
+                ev: true, evMargin: 5, evSwing: 15, minP: 0 };
+
+  // ---------- Reizen nach Erwartungswert (v16, mit Faktoren) ----------
+  // Wert eines Vertrags für das spielende Team = Faktor × (eigene − gegnerische Kartenpunkte) + Gebot × (2·P(erfüllt) − 1).
+  // Weis/Stöck sind beim Reizen unbekannt und werden nicht geschätzt.
+  const CAL = m => isTrumpMode(m) ? 4 : m >= 8 ? 18 : 10;   // Rollouts überschätzen Spiele ohne Trumpf
+  function contractValue(samples, m, b) {
+    const cal = CAL(m);
+    let made = 0, d = 0;
+    for (const x0 of samples) {
+      const x = x0 >= 257 ? 257 : x0 - cal;
+      if (x >= b) made++;
+      d += x >= 257 ? 257 : 2 * x - 157;
+    }
+    const n = samples.length || 1, p = made / n;
+    return { v: J.MULT[m] * (d / n) + b * (2 * p - 1), p };
+  }
+  function openValue(ev, m, b) {
+    const a = contractValue(ev.samples[m], m, b);
+    if (!J.isOpenDirection(m)) return a;
+    const c = contractValue(ev.samples[m + 1], m + 1, b);
+    return a.v >= c.v ? a : c;
+  }
+  // Startrichtung bei Slalom/Quer wählen: die Richtung mit dem höheren Wert für mein Gebot
+  function chooseDirection(game, me, opts) {
+    opts = opts || {};
+    const rnd = opts.rnd || Math.random;
+    const lastBid = {};
+    for (const e of game.bidLog) if (e.type === 'bid' && e.p !== me) lastBid[e.p] = { p: e.p, mode: e.mode, amount: e.amount };
+    const ev = evaluateModes(game.hands[me], me, rnd, opts.n || 32, Object.values(lastBid), [game.mode, game.mode + 1]);
+    const up = contractValue(ev.samples[game.mode], game.mode, game.bid).v;
+    const down = contractValue(ev.samples[game.mode + 1], game.mode + 1, game.bid).v;
+    return { type: 'direction', dir: up >= down ? 'oben' : 'unten' };
+  }
+  const outlookCache = new Map();
+  function evBid(game, me, opts, ev, adj, pBid, rnd, useBids) {
+    const allowed = game.allowedBids();
+    if (!allowed.length) return { type: 'pass' };
+    const b = allowed[0];                       // klein steigern: immer nur die nächste Stufe
+    const hb = game.highBid;
+    const oppHolds = hb && team(hb.p) !== team(me);
+    // Wert, wenn ich passe
+    let vPass = 0;
+    if (hb && !oppHolds) vPass = openValue(ev, hb.mode, hb.amount).v;
+    if (oppHolds) {
+      const k = game.handNo + ':' + me + ':' + hb.p + '/' + hb.mode + '/' + hb.amount;
+      let o = outlookCache.get(k);
+      if (!o) { o = bidOutlook(game, me, hb, rnd, opts.outlookN || 50); outlookCache.set(k, o); if (outlookCache.size > 80) outlookCache.delete(outlookCache.keys().next().value); }
+      vPass = -(J.MULT[hb.mode] * o.diff + hb.amount * (1 - 2 * o.pFail));
+    }
+    // Kandidaten: Spielarten, die meine Hand trägt; gegen ein Gegner-Gebot jede Spielart (Verteidigungsgebot)
+    let bestM = -1, bestV = -Infinity;
+    const vals = [];
+    for (let m = 0; m < J.NUM_MODES; m++) {
+      // Gereizt wird nur 0–5, Slalom (6) und Quer (8); deren Wert ist die bessere der beiden Richtungen
+      if (!J.BID_MODES.includes(m) || (!oppHolds && adj[m] === -Infinity && !(J.isOpenDirection(m) && adj[m + 1] > -Infinity))) { vals.push(null); continue; }
+      const cv = openValue(ev, m, b);
+      vals.push(cv);
+      if (cv.v > bestV) { bestV = cv.v; bestM = m; }
+    }
+    if (bestM < 0) return { type: 'pass' };
+    if (useBids && pBid && vals[pBid.mode] && vals[pBid.mode].v >= bestV - BID.evSwing) { bestM = pBid.mode; bestV = vals[bestM].v; }
+    api._lastEst = ev[bestM]; api._lastEV = { bid: bestV, pass: vPass, mode: bestM, amount: b };
+    if (b >= 257 && vals[bestM].p < 0.5) return { type: 'pass' };
+    const margin = opts.evMargin !== undefined ? opts.evMargin : BID.evMargin;
+    const minP = opts.minP !== undefined ? opts.minP : BID.minP;
+    if (vals[bestM].p < minP) return { type: 'pass' };
+    return bestV > vPass + margin ? { type: 'bid', amount: b, mode: bestM } : { type: 'pass' };
+  }
+  function chooseBidAction(game, me, opts) {
+    opts = opts || {};
+    const rnd = opts.rnd || Math.random;
+    if (game.phase === 'kontra') return { type: decideKontra(game, me, rnd) ? 'kontra' : 'noKontra' };
+    // Bisherige Gebote der anderen (letztes Gebot pro Spieler) fliessen in die Simulation ein
+    const useBids = opts.useBids !== false;
+    const lastBid = {};
+    for (const e of game.bidLog) if (e.type === 'bid' && e.p !== me) lastBid[e.p] = { p: e.p, mode: e.mode, amount: e.amount };
+    const constraints = useBids ? Object.values(lastBid) : [];
+    const partner = (me + 2) % 4, pBid = lastBid[partner];
+    const key = game.handNo + ':' + me + ':' + game.hands[me].slice().sort((a, b) => a - b).join(',') + '|' +
+      constraints.map(k => k.p + '/' + k.mode + '/' + k.amount).join(',');
+    let ev = cache.get(key);
+    if (!ev) { ev = evaluateModes(game.hands[me], me, rnd, opts.n, constraints); cache.set(key, ev); if (cache.size > 80) cache.delete(cache.keys().next().value); }
+    // Kalibrierung aus Simulationen: Obenabe/Undenufe werden in Rollouts überschätzt
+    const adj = ev.map((v, m) => v - (isTrumpMode(m) ? 4 : m >= 8 ? 18 : 10));
+    // Kein Obenabe ohne mindestens zwei Asse, kein Undenufe ohne mindestens zwei Sechser,
+    // kein Trumpf ohne Puur oder Näll (Grundregeln guter Spieler)
+    const hand = game.hands[me];
+    const cnt = r => hand.filter(c => rankOf(c) === r).length;
+    for (let m = 0; m < J.NUM_MODES; m++) {
+      let ok = true;
+      if (m === J.OBENABE) ok = cnt(RA) >= 2;
+      else if (m === J.UNDENUFE) ok = cnt(R6) >= 2;
+      else if (m >= 6) ok = cnt(RA) >= 1 && cnt(R6) >= 1 && cnt(RA) + cnt(R6) >= 3; // Slalom/Quer: beide Richtungen nötig
+      else ok = hand.includes(J.makeCard(m, RU)) || hand.includes(J.makeCard(m, R9));
+      // Die Spielart des Partners darf ich auch ohne Puur/Näll unterstützen (er hat dort die Stärke)
+      if (useBids && pBid && m === pBid.mode) ok = true;
+      if (!ok) adj[m] = -Infinity;
+    }
+    if (opts.ev !== false && BID.ev) return evBid(game, me, opts, ev, adj, pBid, rnd, useBids);
+    for (const m of [6, 8]) { adj[m] = Math.max(adj[m], adj[m + 1]); adj[m + 1] = -Infinity; } // nur Slalom/Quer reizen
+    let bestM = 0;
+    for (let m = 1; m < J.NUM_MODES; m++) if (adj[m] > adj[bestM]) bestM = m;
+    // Zum Partner schwenken: Ist seine Spielart für unser Team fast so gut wie meine beste, reize ich seine
+    // (zeigt ihm, dass ich dort auch gut bin, statt eine neue Farbe ins Spiel zu bringen)
+    let support = false;
+    if (useBids && pBid && adj[pBid.mode] > -Infinity && adj[pBid.mode] >= adj[bestM] - BID.swing) { bestM = pBid.mode; support = true; }
+    if (adj[bestM] === -Infinity) return { type: 'pass' };
+    const est = adj[bestM] - (opts.margin !== undefined ? opts.margin : BID.margin);
+    api._lastEst = adj[bestM];
+    const allowed = game.allowedBids();
+    if (!allowed.length) return { type: 'pass' };
+    const hb = game.highBid;
+    const partnerHolds = hb && team(hb.p) === team(me);
+    // Partner hält das Gebot: in seiner Spielart unterstützen, wenn unser Team mehr schafft als er gereizt hat;
+    // eine andere Spielart nur, wenn sie deutlich besser ist
+    if (partnerHolds) {
+      const need = support && bestM === hb.mode ? BID.supportGap : (opts.partnerGap !== undefined ? opts.partnerGap : BID.partnerGap);
+      if (est < hb.amount + need) return { type: 'pass' };
+    }
+    api._lastSupport = support;
+    const affordable = allowed.filter(b => b <= est && b < 257);
+    if (!affordable.length) return { type: 'pass' };
+    // Nicht unnötig hoch: kleinstes erlaubtes Gebot, ausser in der Eröffnung (dann bis ~ 20 unter Schätzung)
+    let amount = affordable[0];
+    const gap = opts.openGap !== undefined ? opts.openGap : BID.openGap;
+    if (!hb) amount = affordable.filter(b => b <= est - gap).pop() || affordable[0];
+    return { type: 'bid', amount, mode: bestM };
+  }
+
+  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.JassAI = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>/* Sidi Barrani – Kartenbilder nach dem traditionellen Deutschschweizer Muster (19. Jh.), eigene Zeichnungen.
+   Merkmale: gelbe Rosen mit rotem Stempel, Ranken zwischen Rosen- und Eichel-Symbolen,
+   Daus (Ass) mit zwei grossen Symbolen, doppelbildige Under/Ober/König mit eigenen Charakteren. */
+(function (root) {
+  'use strict';
+  const J = root.Jass;
+  const INK = '#24201c';
+  const SKIN = '#f4d3ae';
+
+  const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <radialGradient id="jgGold" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff4b8"/><stop offset=".45" stop-color="#efc035"/><stop offset="1" stop-color="#a8720f"/></radialGradient>
+    <radialGradient id="jgNut" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fbe2a0"/><stop offset=".5" stop-color="#d9a13e"/><stop offset="1" stop-color="#8a5418"/></radialGradient>
+    <radialGradient id="jgPetal" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#f6cf2e"/><stop offset="1" stop-color="#d79a12"/></radialGradient>
+    <radialGradient id="jgPistil" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ff8a4a"/><stop offset="1" stop-color="#c2361a"/></radialGradient>
+    <linearGradient id="jgLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93b44c"/><stop offset="1" stop-color="#3d621f"/></linearGradient>
+    <pattern id="jgHatch" width="2.6" height="2.6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V2.6M0 0H2.6" stroke="#3a3410" stroke-width=".55"/></pattern>
+  </defs></svg>`;
+
+  const f2 = n => n.toFixed(2);
+  const polar = (r, deg) => [r * Math.sin(deg * Math.PI / 180), -r * Math.cos(deg * Math.PI / 180)];
+
+  // ---------- Farbsymbole (Einheit: Radius ~10) ----------
+  function sym(s, x, y, k) {
+    const t = `translate(${f2(x)} ${f2(y)}) scale(${k})`;
+    if (s === 0) { // Schellen: goldene Glocke mit rotem Band
+      return `<g transform="${t}">
+        <path d="M-2.3-9.2a2.3 2.3 0 1 1 4.6 0" fill="none" stroke="#5a3d0c" stroke-width="1.3"/>
+        <circle r="8.7" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width="1"/>
+        <path d="M-8.6-1.9Q0 1.4 8.6-1.9L8.5 1.9Q0 5.2-8.5 1.9Z" fill="#c0262c" stroke="#3a1a0a" stroke-width=".6"/>
+        <path d="M-8.4-.4Q0 2.9 8.4-.4" fill="none" stroke="#f6d36a" stroke-width=".6" opacity=".8"/>
+        <path d="M-3.6 5.3Q0 6.8 3.6 5.3" fill="none" stroke="#2b1a05" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="-3.8" cy="5.2" r="1.1" fill="#2b1a05"/><circle cx="3.8" cy="5.2" r="1.1" fill="#2b1a05"/>
+        <ellipse cx="-3.4" cy="-5" rx="2.2" ry="1.4" fill="#fffbe0" opacity=".65"/></g>`;
+    }
+    if (s === 1) { // Schilten: Schild, grau-schwarz (Wunsch des Spielers)
+      const S = 'M-8.4-9.6H8.4V.4C8.4 6.6 4 9.6 0 11.2-4 9.6-8.4 6.6-8.4.4Z';
+      return `<g transform="${t}">
+        <path d="${S}" fill="#5c5f63"/>
+        <path d="M-6.6-7.8H6.6V.3C6.6 5.3 3.2 7.7 0 9-3.2 7.7-6.6 5.3-6.6.3Z" fill="#e4e5e2"/>
+        <path d="M-6.6-1.2H6.6V.3C6.6 5.3 3.2 7.7 0 9-3.2 7.7-6.6 5.3-6.6.3Z" fill="#26282b"/>
+        <path d="M-6.6-4.6H6.6V-2.6H-6.6Z" fill="#26282b"/>
+        <circle cy="2.6" r="1.6" fill="#b9bcbf" stroke="${INK}" stroke-width=".5"/>
+        <path d="${S}" fill="none" stroke="#111" stroke-width="1"/></g>`;
+    }
+    if (s === 2) { // Eicheln: goldgelbe Nuss, gemusterter Hut, Stiel mit Blatt
+      return `<g transform="${t}">
+        <path d="M-1.2-7.8C-8-12.8-13.4-6.6-10.8-1.8-9-4-6.4-5.4-1.2-7.8Z" fill="url(#jgLeaf)" stroke="#2f4214" stroke-width=".6"/>
+        <path d="M-10.2-2.6Q-6.8-6-2-7.4" fill="none" stroke="#2f4214" stroke-width=".45"/>
+        <path d="M.4-9.6Q1.4-12.6 3.8-12.6" fill="none" stroke="#4a3112" stroke-width="1.4" stroke-linecap="round"/>
+        <ellipse cx="0" cy="3.4" rx="5.6" ry="7.1" fill="url(#jgNut)" stroke="#6a3f12" stroke-width=".9"/>
+        <path d="M-2.4 1.5Q-2.8 6 -1 9" fill="none" stroke="#fff3c8" stroke-width=".9" opacity=".7" stroke-linecap="round"/>
+        <circle cx="0" cy="10.5" r=".8" fill="#6a3f12"/>
+        <path d="M-7.6-.4C-7.8-6.8-4-9.8 0-9.8S7.8-6.8 7.6-.4C4.6.9-4.6.9-7.6-.4Z" fill="#8a6a22" stroke="#3a2a08" stroke-width=".9"/>
+        <path d="M-7.6-.4C-7.8-6.8-4-9.8 0-9.8S7.8-6.8 7.6-.4C4.6.9-4.6.9-7.6-.4Z" fill="url(#jgHatch)" opacity=".75"/></g>`;
+    }
+    // Rosen: stilisierte gelbe Blume, orange-roter Stempel, grüne Kelchblätter
+    let out = `<g transform="${t}"><g fill="url(#jgLeaf)" stroke="#2f4214" stroke-width=".5">`;
+    for (const a of [36, 108, 180, 252, 324]) out += `<path d="M-1.9-3.5Q-2.3-8.6 0-11.4Q2.3-8.6 1.9-3.5Z" transform="rotate(${a})"/>`;
+    out += `</g>`;
+    for (const a of [0, 72, 144, 216, 288]) {
+      out += `<path d="M-3.3-2.4C-5.6-5.4-4.4-9.8 0-9.8S5.6-5.4 3.3-2.4Z" transform="rotate(${a})" fill="url(#jgPetal)" stroke="#a5620c" stroke-width=".6"/>`;
+      out += `<path d="M0-3.6V-8" transform="rotate(${a})" stroke="#d48a12" stroke-width=".5" opacity=".7"/>`;
+    }
+    out += `<circle r="3.9" fill="url(#jgPistil)" stroke="#7c220c" stroke-width=".6"/>`;
+    for (const a of [0, 60, 120, 180, 240, 300]) { const [px, py] = polar(2.4, a); out += `<circle cx="${f2(px)}" cy="${f2(py)}" r=".55" fill="#ffd25a"/>`; }
+    return out + `<circle r="1.2" fill="#ffe27a" stroke="#9a3a10" stroke-width=".35"/></g>`;
+  }
+
+  const ARROW_DOWN = 'M0 9L8-3H3V-9H-3V-3H-8Z';  // Obenabe: von oben nach unten
+  const ARROW_UP = 'M0-9L8 3H3V9H-3V3H-8Z';    // Undenufe
+  // Gebots-Symbol: bei Slalom (6) und Quer (8) ohne Richtung (Doppelpfeil mit Welle bzw. Strich)
+  function bidModeIcon(m) {
+    if (m !== 6 && m !== 8) return modeIcon(m);
+    const dbl = 'M0-10L6-3.5H2V3.5H6L0 10L-6 3.5H-2V-3.5H-6Z';
+    const mark = m === 8 ? '<path d="M8.5-9V9" stroke="currentColor" stroke-width="1.8"/>'
+                         : '<path d="M5.5 6Q7.5 2 9.5 6T13.5 6" fill="none" stroke="currentColor" stroke-width="1.5"/>';
+    return `<svg viewBox="-17 -12 34 24" aria-hidden="true"><g transform="translate(-4 0)"><path d="${dbl}" fill="currentColor"/></g>${mark}</svg>`;
+  }
+  function modeIcon(m) {
+    if (m <= 3) return `<svg viewBox="-13 -14 26 27" aria-hidden="true">${sym(m, 0, 0, 1)}</svg>`;
+    if (m === 4 || m === 5) return `<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="${m === 4 ? ARROW_DOWN : ARROW_UP}" fill="currentColor"/></svg>`;
+    // Slalom / Quer: zwei Pfeile, links die Startrichtung. Quer mit Trennstrich, Slalom mit Welle.
+    const first = (m === 6 || m === 8) ? ARROW_DOWN : ARROW_UP, second = first === ARROW_DOWN ? ARROW_UP : ARROW_DOWN;
+    const mid = m >= 8 ? '<path d="M0-10V10" stroke="currentColor" stroke-width="1.6"/>'
+                       : '<path d="M-3 11Q-1.5 8 0 11T3 11" fill="none" stroke="currentColor" stroke-width="1.4"/>';
+    return `<svg viewBox="-17 -12 34 24" aria-hidden="true"><g transform="translate(-8.5 0) scale(.78)"><path d="${first}" fill="currentColor"/></g>${mid}<g transform="translate(8.5 0) scale(.78)"><path d="${second}" fill="currentColor" opacity=".7"/></g></svg>`;
+  }
+
+  // ---------- Zahlkarten ----------
+  const PIPS = {
+    0: { k: .78, p: [[19, 20], [41, 20], [19, 45], [41, 45], [19, 70], [41, 70]] },
+    1: { k: .72, p: [[19, 19], [41, 19], [30, 32], [19, 46], [41, 46], [19, 72], [41, 72]] },
+    2: { k: .7, p: [[19, 17], [41, 17], [19, 36], [41, 36], [19, 55], [41, 55], [19, 74], [41, 74]] },
+    3: { k: .62, p: [[19, 16], [41, 16], [19, 34], [41, 34], [30, 45], [19, 56], [41, 56], [19, 74], [41, 74]] }
+  };
+
+  // Ranken (Rosen) bzw. Zweige (Eicheln), welche die Symbole verbinden
+  function vines(s, pts) {
+    const col = s === 3 ? '#4f7a2c' : '#6b4a2a';
+    const leafFill = 'url(#jgLeaf)';
+    let d = '', leaves = '';
+    const cols = {};
+    for (const [x, y] of pts) (cols[x] = cols[x] || []).push(y);
+    for (const xs of Object.keys(cols)) {
+      const x = +xs, ys = cols[x].sort((a, b) => a - b);
+      if (ys.length < 2) continue;
+      d += `M${x} ${ys[0]}`;
+      for (let i = 1; i < ys.length; i++) {
+        const my = (ys[i - 1] + ys[i]) / 2, off = (i % 2 ? 3.4 : -3.4) * (x < 30 ? -1 : 1);
+        d += `Q${x + off} ${my} ${x} ${ys[i]}`;
+        const lx = x + off * .55, ang = off > 0 ? 35 : -35;
+        leaves += `<ellipse cx="${f2(lx)}" cy="${f2(my)}" rx="2.4" ry="1.05" transform="rotate(${ang} ${f2(lx)} ${f2(my)})"/>`;
+      }
+    }
+    // Mittelsymbol mit den Spalten verbinden
+    for (const [x, y] of pts) if (x === 30) d += `M19 ${y - 6}Q24 ${y - 1} 30 ${y}Q36 ${y - 1} 41 ${y - 6}`;
+    return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.15" stroke-linecap="round"/>` +
+      `<g fill="${leafFill}" stroke="#2f4214" stroke-width=".35">${leaves}</g>`;
+  }
+
+  function pipCard(s, r) {
+    const { k, p } = PIPS[r];
+    const v = s === 2 || s === 3 ? vines(s, p) : '';
+    return v + p.map(([x, y]) => sym(s, x, y, k)).join('');
+  }
+
+  // ---------- Banner (10) ----------
+  function banner(s) {
+    const flag = 'M16.6 10C25.6 6 33 13.6 46.6 9.4L41.4 30L46.6 50.6C33 54.8 25.6 47.2 16.6 51.2Z';
+    return `<path d="M15 8V86" stroke="#6b4a2a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M13.6 86H16.4" stroke="#6b4a2a" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M15 2.2L16.9 6.4L15 8.4L13.1 6.4Z" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".5"/>
+      <path d="${flag}" fill="#fffdf7" stroke="${INK}" stroke-width=".7"/>
+      <path d="M16.6 13.4C25.6 9.4 33 17 45.6 13M16.6 47.8C25.6 43.8 33 51.4 45.6 47.2" fill="none" stroke="#c0262c" stroke-width="2"/>
+      <path d="M17 10V51" stroke="#c0262c" stroke-width="1.4"/>
+      ${sym(s, 30.4, 30.4, 1)}
+      <path d="M15 52.4L13 58.6H17Z" fill="#c0262c" stroke="${INK}" stroke-width=".4"/>`;
+  }
+
+  // ---------- Daus / Ass ----------
+  const SUIT_LABEL = ['Schellen', 'Schilten', 'Eicheln', 'Rosen'];
+  function ass(s) {
+    let deco = '';
+    if (s === 2 || s === 3) {
+      const col = s === 3 ? '#4f7a2c' : '#6b4a2a';
+      deco = `<path d="M30 33Q13 38 14 45Q13 52 30 57M30 33Q47 38 46 45Q47 52 30 57" fill="none" stroke="${col}" stroke-width="1.3"/>
+        <g fill="url(#jgLeaf)" stroke="#2f4214" stroke-width=".35">
+          <ellipse cx="15.2" cy="39.5" rx="3" ry="1.3" transform="rotate(-50 15.2 39.5)"/><ellipse cx="15.2" cy="50.5" rx="3" ry="1.3" transform="rotate(50 15.2 50.5)"/>
+          <ellipse cx="44.8" cy="39.5" rx="3" ry="1.3" transform="rotate(50 44.8 39.5)"/><ellipse cx="44.8" cy="50.5" rx="3" ry="1.3" transform="rotate(-50 44.8 50.5)"/></g>`;
+    } else {
+      deco = `<path d="M13 45C13 38 19 38 19 42M47 45C47 52 41 52 41 48M13 45C13 52 19 52 19 48M47 45C47 38 41 38 41 42" fill="none" stroke="#a8720f" stroke-width="1"/>`;
+    }
+    return `${deco}
+      ${sym(s, 30, 22.5, 1.32)}
+      ${sym(s, 30, 67.5, 1.32)}
+      <path d="M17.5 41H42.5L45 45L42.5 49H17.5L15 45Z" fill="#fffdf7" stroke="${INK}" stroke-width=".6"/>
+      <text x="30" y="47.2" text-anchor="middle" font-family="'Grenze Gotisch', Georgia, serif" font-size="6" fill="${INK}">${SUIT_LABEL[s]}</text>`;
+  }
+
+  // ---------- Bildkarten (doppelbildig) ----------
+  // Charaktere nach dem traditionellen Muster: Kleidung, Kopfbedeckung, Bart, Haar, Besonderheit
+  const COURT = {
+    5: [ // Under: hält das Symbol nach unten
+      { coat: '#f2c230', trim: '#c0262c', hat: 'fool', hair: '#e2b24a' },                 // Schellen: Narr
+      { coat: '#2f5aa6', trim: '#f2c230', hat: 'tassel', hair: '#b8b2a6', quill: true },    // Schilten: Bote mit Feder
+      { coat: '#3f7a35', trim: '#c0262c', hat: 'beret', hair: '#e2b24a', feather: '#c0262c' }, // Eicheln: Soldat
+      { coat: '#c0262c', trim: '#3f7a35', hat: 'straw', hair: '#e2b24a' }                   // Rosen: Bauer
+    ],
+    6: [ // Ober: hält das Symbol nach oben
+      { coat: '#c0262c', trim: '#f2c230', hat: 'tall', hatCol: '#24201c', hair: '#b8b2a6', beard: 'mous' },
+      { coat: '#24201c', trim: '#c0262c', hat: 'none', hair: '#e2b24a', beard: 'mous', cig: true },
+      { coat: '#2f5aa6', trim: '#f2c230', hat: 'beret', hatCol: '#c0262c', hair: '#e2b24a', pipe: true, symLeft: true },
+      { coat: '#3f7a35', trim: '#f2c230', hat: 'beret', hatCol: '#2f5aa6', hair: '#e2b24a', feather: '#fffdf7', beard: 'mous' }
+    ],
+    7: [ // König: Krone, Bart, Hermelin
+      { coat: '#c0262c', trim: '#f2c230', hat: 'crown', hair: '#e2b24a', beard: 'fork' },
+      { coat: '#2f5aa6', trim: '#f2c230', hat: 'crown', hair: '#e2b24a', beard: 'short', cup: true, symLeft: true },
+      { coat: '#3f7a35', trim: '#c0262c', hat: 'crown', hair: '#e2b24a', beard: 'long' },
+      { coat: '#c0262c', trim: '#2f5aa6', hat: 'crown', hair: '#e2b24a', beard: 'short' }
+    ]
+  };
+
+  function headwear(c) {
+    switch (c.hat) {
+      case 'crown':
+        return `<path d="M24.4 13.4L23.4 6.2L26.6 9.6L30 4.6L33.4 9.6L36.6 6.2L35.6 13.4Z" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".6"/>
+          <path d="M24.4 13.4H35.6" stroke="#5a3d0c" stroke-width="1.2"/>
+          <circle cx="30" cy="11" r=".95" fill="#c0262c"/><circle cx="26.7" cy="11.5" r=".7" fill="#2f5aa6"/><circle cx="33.3" cy="11.5" r=".7" fill="#2f5aa6"/>`;
+      case 'fool':
+        return `<path d="M24.2 15Q24 9.8 30 9.6Q36 9.8 35.8 15Z" fill="#c0262c" stroke="${INK}" stroke-width=".5"/>
+          <path d="M25 12Q19 8 17.4 13.6Q21 11.6 25.6 14Z" fill="#f2c230" stroke="${INK}" stroke-width=".5"/>
+          <path d="M35 12Q41 8 42.6 13.6Q39 11.6 34.4 14Z" fill="#2f5aa6" stroke="${INK}" stroke-width=".5"/>
+          <circle cx="17.4" cy="14.2" r="1.3" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".4"/>
+          <circle cx="42.6" cy="14.2" r="1.3" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".4"/>`;
+      case 'tassel':
+        return `<path d="M24 15Q23.6 9 30 8.8Q36.8 9 36.4 13.8Q31 12.2 24 15Z" fill="#c0262c" stroke="${INK}" stroke-width=".5"/>
+          <path d="M36.2 12.4Q39 14 38.4 18" fill="none" stroke="${INK}" stroke-width=".5"/>
+          <path d="M37.6 17.6L38.4 21L39.2 17.6Z" fill="#f2c230" stroke="${INK}" stroke-width=".35"/>`;
+      case 'beret':
+        return `<path d="M22.8 14.4Q23 9.4 30.6 9.2Q38.4 9.6 38 13.6Q31 12.4 22.8 14.4Z" fill="${c.hatCol || '#24201c'}" stroke="${INK}" stroke-width=".5"/>
+          ${c.feather ? `<path d="M35.6 10.4Q41 3.6 44 6.4Q40.2 7.2 37 11.6" fill="${c.feather}" stroke="${INK}" stroke-width=".45"/>` : ''}`;
+      case 'straw':
+        return `<path d="M19.6 14.6Q30 11.6 40.4 14.6Q36.4 16 30 15.6Q23.6 16 19.6 14.6Z" fill="#e8c46a" stroke="${INK}" stroke-width=".5"/>
+          <path d="M25 14Q25.4 8.6 30 8.6Q34.6 8.6 35 14Z" fill="#e8c46a" stroke="${INK}" stroke-width=".5"/>
+          <path d="M25.2 12.6H34.8" stroke="#c0262c" stroke-width="1"/>`;
+      case 'tall':
+        return `<path d="M25.4 13.8L26.2 5.6H33.8L34.6 13.8Z" fill="${c.hatCol}" stroke="${INK}" stroke-width=".5"/>
+          <path d="M22.6 14Q30 12.4 37.4 14L37 15Q30 13.8 23 15Z" fill="${c.hatCol}" stroke="${INK}" stroke-width=".5"/>
+          <path d="M26 12H34" stroke="#f2c230" stroke-width="1"/>`;
+      default: return '';
+    }
+  }
+
+  function beard(type) {
+    switch (type) {
+      case 'mous': return `<path d="M27.4 21.4Q30 20.2 32.6 21.4Q30 22.4 27.4 21.4Z" fill="#a8823a"/>`;
+      case 'short': return `<path d="M25.4 19.6Q25.6 26.4 30 26.6Q34.4 26.4 34.6 19.6Q32.6 22.6 30 22.6Q27.4 22.6 25.4 19.6Z" fill="#d9a842" stroke="${INK}" stroke-width=".35"/>`;
+      case 'fork': return `<path d="M25.4 19.6Q25.4 25 28.4 28.4L30 26.2L31.6 28.4Q34.6 25 34.6 19.6Q32.6 22.6 30 22.6Q27.4 22.6 25.4 19.6Z" fill="#d9a842" stroke="${INK}" stroke-width=".35"/>`;
+      case 'long': return `<path d="M25.4 19.6Q24.6 30 30 33.2Q35.4 30 34.6 19.6Q32.6 22.6 30 22.6Q27.4 22.6 25.4 19.6Z" fill="#ece6d6" stroke="${INK}" stroke-width=".35"/>
+        <path d="M28.2 25V30M30 25.4V31.6M31.8 25V30" stroke="#b9b2a0" stroke-width=".4"/>`;
+      default: return '';
+    }
+  }
+
+  function halfFigure(s, r) {
+    const c = COURT[r][s];
+    const king = r === 7, under = r === 5;
+    let g = '';
+    // Rumpf (endet an der Mittellinie)
+    g += `<path d="M20.4 45L16.2 36.2Q16.6 28.8 30 27.6Q43.4 28.8 43.8 36.2L39.6 45Z" fill="${c.coat}" stroke="${INK}" stroke-width=".7"/>`;
+    g += `<path d="M28.4 28V45H31.6V28Z" fill="${c.trim}" stroke="${INK}" stroke-width=".4"/>`;
+    g += [32.5, 36.5, 40].map(y => `<circle cx="30" cy="${y}" r=".75" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".25"/>`).join('');
+    g += `<path d="M19.4 43.2H40.6" stroke="${INK}" stroke-width="1.8"/><rect x="28.6" y="42.2" width="2.8" height="2" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".3"/>`;
+    if (king) { // Hermelinkragen
+      g += `<path d="M16.4 34.6Q16.8 28.8 30 27.8Q43.2 28.8 43.6 34.6Q30 32 16.4 34.6Z" fill="#fffdf7" stroke="${INK}" stroke-width=".5"/>`;
+      g += [19.5, 24, 28, 32, 36, 40.5].map(x => `<path d="M${x} 31.2v1.6" stroke="${INK}" stroke-width=".9" stroke-linecap="round"/>`).join('');
+    } else {
+      g += `<path d="M24 28.2Q27 26.4 30 28.6Q33 26.4 36 28.2Q33 30.8 30 29.8Q27 30.8 24 28.2Z" fill="#fffdf7" stroke="${INK}" stroke-width=".45"/>`;
+    }
+    // Hals und Kopf
+    g += `<path d="M28 22.6H32V27.4H28Z" fill="${SKIN}"/>`;
+    g += `<path d="M24.6 19.4Q24 11.8 30 11.4Q36 11.8 35.4 19.4L35 15.8Q30 14 25 15.8Z" fill="${c.hair}" stroke="${INK}" stroke-width=".35"/>`;
+    g += `<ellipse cx="30" cy="18.4" rx="5.1" ry="5.9" fill="${SKIN}" stroke="${INK}" stroke-width=".6"/>`;
+    g += `<path d="M24.8 18.6Q24 23.8 26.6 24.6M35.2 18.6Q36 23.8 33.4 24.6" fill="none" stroke="${c.hair}" stroke-width="1.4" stroke-linecap="round"/>`;
+    g += `<path d="M27 16.2Q28 15.6 29 16.1M31 16.1Q32 15.6 33 16.2" fill="none" stroke="${INK}" stroke-width=".45" stroke-linecap="round"/>`;
+    g += `<circle cx="28" cy="17.7" r=".6" fill="${INK}"/><circle cx="32" cy="17.7" r=".6" fill="${INK}"/>`;
+    g += `<path d="M30 18.2Q29.4 20 30.4 20.2" fill="none" stroke="#b07a52" stroke-width=".5" stroke-linecap="round"/>`;
+    g += `<circle cx="26.9" cy="20.2" r="1.1" fill="#ec9a8a" opacity=".45"/><circle cx="33.1" cy="20.2" r="1.1" fill="#ec9a8a" opacity=".45"/>`;
+    g += `<path d="M28.6 21.9Q30 22.7 31.4 21.9" fill="none" stroke="#9a3a2a" stroke-width=".55" stroke-linecap="round"/>`;
+    g += beard(c.beard);
+    g += headwear(c);
+    if (c.quill) g += `<path d="M24.6 16.4L19.4 9.6" stroke="#fffdf7" stroke-width="1.4" stroke-linecap="round"/><path d="M24.6 16.4L19.4 9.6" stroke="${INK}" stroke-width=".3"/>`;
+    if (c.pipe) g += `<path d="M31.2 21.8Q34 23.2 36.4 23" fill="none" stroke="#5a3a1a" stroke-width=".8"/><path d="M36 21.4H38.6V24.2Q37.3 25.2 36 24.2Z" fill="#7a4a22" stroke="${INK}" stroke-width=".35"/>`;
+    if (c.cig) g += `<path d="M31.2 21.8L35.4 22.6" stroke="#fffdf7" stroke-width=".9"/><path d="M35.6 22.6Q37 20.6 36.2 18.6" fill="none" stroke="#b9b4a8" stroke-width=".45" opacity=".8"/>`;
+
+    // Arm und Symbol
+    g += `<path d="M18.2 31.6Q15.2 37 18.4 44" fill="none" stroke="${INK}" stroke-width="4.6" stroke-linecap="round"/><path d="M18.2 31.6Q15.2 37 18.4 44" fill="none" stroke="${c.coat}" stroke-width="3.6" stroke-linecap="round"/>`;
+    const sleeve = (d) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="4.6" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${c.coat}" stroke-width="3.6" stroke-linecap="round"/>`;
+    if (c.symLeft) {
+      // Pfeife bzw. Becher in der Hand, Symbol schwebt oben links
+      g += sleeve('M41.8 31.6Q46 31.4 44.4 25.4');
+      g += `<circle cx="44.2" cy="24.6" r="1.5" fill="${SKIN}" stroke="${INK}" stroke-width=".35"/>`;
+      if (c.cup) g += `<path d="M41.4 17.4H47L46 21.6Q44.2 22.6 42.4 21.6Z" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".45"/><path d="M44.2 22V24" stroke="#a8720f" stroke-width="1"/>`;
+      g += sym(s, 14.4, 27.4, .5);
+    } else if (under) {
+      g += sleeve('M41.8 31.6Q46.4 34.6 44.6 39');
+      g += sym(s, 43, 39.4, .52);
+    } else {
+      g += sleeve('M41.8 31.6Q46.8 27 45.4 18.6');
+      g += `<circle cx="45.3" cy="17.6" r="1.5" fill="${SKIN}" stroke="${INK}" stroke-width=".35"/>`;
+      g += sym(s, 45.4, 11, .52);
+    }
+    if (king && !c.symLeft) g += `<path d="M14.6 44L19.4 25.4" stroke="#a8720f" stroke-width="1.2" stroke-linecap="round"/><circle cx="19.6" cy="24.4" r="1.5" fill="url(#jgGold)" stroke="#5a3d0c" stroke-width=".4"/>`;
+    return g;
+  }
+
+  function court(s, r) {
+    const half = halfFigure(s, r);
+    return `<rect x="7.4" y="4.6" width="45.2" height="80.8" rx="1.6" fill="none" stroke="${INK}" stroke-width=".4"/>
+      <g>${half}</g><g transform="rotate(180 30 45)">${half}</g>
+      <path d="M7.4 45H52.6" stroke="${INK}" stroke-width=".5"/>`;
+  }
+
+  // ---------- Karte ----------
+  const IDX = ['6', '7', '8', '9', '10', 'U', 'O', 'K', 'A'];
+  const cache = new Map();
+  function cardSVG(c) {
+    if (cache.has(c)) return cache.get(c);
+    const s = J.suitOf(c), r = J.rankOf(c);
+    let mid;
+    if (r <= 3) mid = pipCard(s, r);
+    else if (r === 4) mid = banner(s);
+    else if (r === 8) mid = ass(s);
+    else mid = court(s, r);
+    const fs = r === 4 ? 7.2 : 8.6;
+    const plate = (x, y) => `<rect x="${x}" y="${y}" width="9.4" height="17.6" rx="1.4" fill="#fffdf7"/>`;
+    const idx = `${plate(2.4, 2.4)}<text x="7.1" y="10.2" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="${fs}" fill="${INK}">${IDX[r]}</text>${sym(s, 7.1, 15.6, .3)}`;
+    const idx2 = `${plate(48.2, 70)}${sym(s, 52.9, 74.6, .3)}<text x="52.9" y="86.2" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="${fs}" fill="${INK}">${IDX[r]}</text>`;
+    const svg = `<svg viewBox="0 0 60 90" role="img" aria-label="${J.cardName(c)}">
+      <rect x=".6" y=".6" width="58.8" height="88.8" rx="4.5" fill="#fffdf7" stroke="${INK}" stroke-width="1.1"/>
+      ${mid}${idx}${idx2}</svg>`;
+    cache.set(c, svg);
+    return svg;
+  }
+
+  function install() {
+    if (document.getElementById('jgDefs')) return;
+    const d = document.createElement('div');
+    d.id = 'jgDefs';
+    d.innerHTML = DEFS;
+    document.body.prepend(d);
+  }
+
+  root.JassCards = { sym, modeIcon, bidModeIcon, cardSVG, install };
+})(window);
+</script>
+<script>
+(function () {
+'use strict';
+const J = window.Jass, AI = window.JassAI;
+// Spielernamen: «Du» bleibt; Ost, Nord (Partner) und West erhalten pro Partie drei von vier Namen.
+// Jede neue Partie rückt die Besetzung um einen Platz weiter, so wechseln auch Partner und Gegner.
+const NAME_POOL = ['Chrigi', 'Urs', 'Alex', 'Marco'];
+let NAMES = ['Du', NAME_POOL[0], NAME_POOL[1], NAME_POOL[2]];
+function assignNames() {
+  let k = Math.floor(Math.random() * 4);
+  try { const v = parseInt(localStorage.getItem('sb-partie'), 10); if (!isNaN(v)) k = v + 1; } catch (e) {}
+  try { localStorage.setItem('sb-partie', String(k)); } catch (e) {}
+  NAMES = ['Du', NAME_POOL[k % 4], NAME_POOL[(k + 1) % 4], NAME_POOL[(k + 2) % 4]];
+}
+const teamName = t => t === 0 ? `Du & ${NAMES[2]}` : `${NAMES[1]} & ${NAMES[3]}`;
+function renderTeams() {
+  $('teamsLine').textContent = `Du & ${NAMES[2]} gegen ${NAMES[1]} & ${NAMES[3]}`;
+  $('whoA').textContent = teamName(0);
+  $('whoB').textContent = teamName(1);
+}
+const MODE_NAMES = J.MODES.slice();
+
+const { modeIcon, bidModeIcon, cardSVG } = window.JassCards;
+window.JassCards.install();
+
+// ---------- Zustand ----------
+let g;
+let shownTrick = [];      // aktuell im Stichfeld angezeigte Karten
+let trickWinner = -1;
+let pausing = false;
+let timer = null;
+let bubbles = {};         // p -> {text, kontra}
+let bubbleTimers = {};
+let statusMsg = '';
+let selAmount = null, selMode = null;
+let modal = null;         // 'result' | 'rules' | null
+let kontraTimed = false;  // Kontra-Knopf läuft mit Zeitbalken
+
+let celebrated = false;
+function newGame() { celebrated = false; assignNames(); g = new J.Game({}); shownTrick = []; trickWinner = -1; pausing = false; modal = null; clearBubbles(); step(); }
+
+function clearBubbles() { bubbles = {}; for (const k in bubbleTimers) clearTimeout(bubbleTimers[k]); bubbleTimers = {}; }
+function say(p, text, opts) {
+  opts = opts || {};
+  bubbles[p] = { text, kontra: !!opts.kontra };
+  clearTimeout(bubbleTimers[p]);
+  bubbleTimers[p] = setTimeout(() => { delete bubbles[p]; renderSeats(); }, opts.ms || 1600);
+  renderSeats();
+}
+// ---------- Siegesfeier ----------
+// Raketen steigen auf und platzen; die letzten Funken fliegen zusammen und schreiben die Namen der Sieger.
+function celebrate(r, done) {
+  const t = r.gameWinner;
+  const names = t === 0 ? `Du & ${NAMES[2]}` : `${NAMES[1]} & ${NAMES[3]}`;
+  const box = document.createElement('div');
+  box.className = 'fw'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', names + ' gewinnen');
+  box.innerHTML = `<canvas></canvas><div class="cap"><div class="t">${esc(names)} gewinnen!</div>
+    <div class="s">${r.scores[t]} : ${r.scores[1 - t]}${r.doppel ? ' · Doppelsieg!' : ''}</div><div class="k">Tippen zum Weiter</div></div>`;
+  document.body.appendChild(box);
+  const cv = box.querySelector('canvas'), cx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, dpr, raf, ended = false, dotR = 1.9;
+  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+  size();
+  const COLORS = ['#d8a531', '#ffe08a', '#e8484e', '#f6f2e4', '#5fc3a0', '#7fb2ff', '#ff9a3c'];
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const rockets = [], sparks = [], dots = [];
+
+  // Zielpunkte für den Namensschriftzug aus einem unsichtbaren Text-Canvas abtasten
+  function textTargets() {
+    const fs = Math.min(W / (names.length * 0.52), H * 0.2, 130);
+    const oc = document.createElement('canvas'); oc.width = W; oc.height = Math.ceil(fs * 1.4);
+    const o = oc.getContext('2d');
+    o.font = `700 ${fs}px 'Grenze Gotisch', Georgia, serif`; o.textAlign = 'center'; o.textBaseline = 'middle';
+    o.fillStyle = '#fff'; o.fillText(names, W / 2, oc.height / 2);
+    const d = o.getImageData(0, 0, oc.width, oc.height).data, pts = [];
+    const stepPx = Math.max(3, Math.round(fs / 28)); dotR = Math.max(1.5, stepPx * .42);
+    const top = H * 0.36 - oc.height / 2;
+    for (let y = 0; y < oc.height; y += stepPx) for (let x = 0; x < oc.width; x += stepPx)
+      if (d[(y * oc.width + x) * 4 + 3] > 128) pts.push({ x, y: y + top });
+    return pts;
+  }
+
+  function burst(x, y, col, n) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, v = 1.5 + Math.random() * 4.5;
+      sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, decay: .012 + Math.random() * .014, col: Math.random() < .25 ? '#fff' : col });
+    }
+  }
+  function launch(x) {
+    rockets.push({ x, y: H, vx: (Math.random() - .5) * 1.4, vy: -(H * .011 + Math.random() * H * .004), col: pick(COLORS) });
+  }
+  function writeNames() {
+    const pts = textTargets();
+    const ox = W / 2, oy = H * .62;
+    burst(ox, oy, '#ffe08a', 90);
+    pts.forEach((p, i) => dots.push({ x: ox + (Math.random() - .5) * 40, y: oy + (Math.random() - .5) * 40, tx: p.x, ty: p.y, delay: Math.random() * 18, col: i % 7 === 0 ? '#fff' : pick(['#d8a531', '#ffe08a', '#ffd25e']), tw: Math.random() * 6 }));
+  }
+
+  const t0 = performance.now();
+  let nextLaunch = 0, wrote = false, frame = 0;
+  function tick(now) {
+    const el = now - t0; frame++;
+    if (el < 2600 && el > nextLaunch) { launch(W * (.15 + Math.random() * .7)); nextLaunch = el + 260 + Math.random() * 260; }
+    if (!wrote && el > 2300) { wrote = true; writeNames(); }
+    if (el > 3200 && el < 7600 && Math.random() < .035) burst(W * (.08 + Math.random() * .84), H * (.08 + Math.random() * .2), pick(COLORS), 40);
+
+    cx.globalCompositeOperation = 'source-over';
+    cx.clearRect(0, 0, W, H);
+    cx.globalCompositeOperation = 'lighter';
+    for (let i = rockets.length - 1; i >= 0; i--) {
+      const r = rockets[i]; r.x += r.vx; r.y += r.vy; r.vy += H * .00016;
+      cx.fillStyle = '#ffe9b0'; cx.fillRect(r.x - 1.5, r.y - 1.5, 3, 3);
+      cx.fillStyle = 'rgba(255,200,120,.35)'; cx.fillRect(r.x - 1, r.y + 2, 2, 8);
+      if (r.vy >= -1) { burst(r.x, r.y, r.col, 70); rockets.splice(i, 1); }
+    }
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.vx *= .975; s.vy = s.vy * .975 + .06; s.life -= s.decay;
+      if (s.life <= 0) { sparks.splice(i, 1); continue; }
+      cx.globalAlpha = s.life; cx.fillStyle = s.col; cx.beginPath(); cx.arc(s.x, s.y, 1.8, 0, 7); cx.fill();
+    }
+    for (const d of dots) {
+      if (d.delay > 0) { d.delay--; continue; }
+      d.x += (d.tx - d.x) * .09; d.y += (d.ty - d.y) * .09;
+      cx.globalAlpha = .65 + .35 * Math.sin(frame * .15 + d.tw);
+      cx.fillStyle = d.col; cx.beginPath(); cx.arc(d.x, d.y, dotR, 0, 7); cx.fill();
+    }
+    cx.globalAlpha = 1;
+    if (el > 8500) finish(); else raf = requestAnimationFrame(tick);
+  }
+  function staticNames() {
+    // Ohne Animation: Schriftzug direkt als Funkenpunkte zeichnen
+    cx.clearRect(0, 0, W, H);
+    for (const p of textTargets()) { cx.fillStyle = pick(['#d8a531', '#ffe08a']); cx.beginPath(); cx.arc(p.x, p.y, dotR, 0, 7); cx.fill(); }
+  }
+  function finish() {
+    if (ended) return; ended = true;
+    cancelAnimationFrame(raf); clearTimeout(skipT);
+    box.classList.add('out');
+    setTimeout(() => box.remove(), 600);
+    done();
+  }
+  box.addEventListener('click', finish);
+  let skipT = null;
+  const go = () => { if (ended) return; if (reduce) { staticNames(); skipT = setTimeout(finish, 6000); } else raf = requestAnimationFrame(tick); };
+  // Schrift für den Namenszug laden, bevor die Punkte abgetastet werden
+  (document.fonts && document.fonts.load ? document.fonts.load("700 40px 'Grenze Gotisch'").catch(() => {}) : Promise.resolve()).then(go);
+}
+
+function later(fn, ms) { clearTimeout(timer); timer = setTimeout(fn, ms); }
+
+// ---------- Ablauf ----------
+function step() {
+  render();
+  if (modal) return;
+  if (g.phase === 'gameOver' && !celebrated) { celebrated = true; celebrate(g.lastHand, () => { modal = 'result'; render(); }); return; }
+  if (g.phase === 'handOver' || g.phase === 'gameOver') { modal = 'result'; render(); return; }
+  if (g.phase === 'bidding' || g.phase === 'kontra') {
+    if (g.turn === 0) {
+      if (g.phase === 'kontra' && !humanNextRegular()) {
+        // Du bist nicht direkt danach am Zug: Kontra-Knopf 3 Sekunden lang aktiv, dann geht es weiter
+        kontraTimed = true;
+        renderKontra();
+        later(() => { kontraTimed = false; applyBid(0, { type: 'noKontra' }); }, 3000);
+      }
+      return; // Reiz-Panel bzw. Kontra-Knopf wartet auf dich
+    }
+    later(() => { const p = g.turn; applyBid(p, AI.chooseBidAction(g, p)); }, 750);
+    return;
+  }
+  if (g.phase === 'direction') {
+    if (g.turn === 0) return; // Richtungs-Panel wartet auf dich
+    later(() => { const p = g.turn; applyDirection(p, AI.chooseDirection(g, p)); }, 900);
+    return;
+  }
+  if (g.phase === 'play') {
+    if (pausing) return;
+    if (g.turn === 0) return;
+    later(() => { const p = g.turn; playCard(p, AI.chooseCard(g, p, { samples: 40 })); }, 650);
+  }
+}
+
+// Gebote nennen bei Slalom/Quer keine Richtung
+const BID_NAME = m => J.bidModeName(m);
+function bidText(a) { return a.amount + ' ' + BID_NAME(a.mode); }
+
+// Bin ich nach dem Kontra-Fenster regulär am Zug? Dann zeige ich gleich das Reiz-Panel.
+function humanNextRegular() {
+  return g.phase === 'kontra' && g.kontraQueue[0] === 0 && g.kontraQueue.length === 1 && g.highBid.amount !== 257;
+}
+// Eigene Reiz-Aktion; ein offenes Kontra-Fenster wird dabei stillschweigend mit «kein Kontra» geschlossen
+function humanBid(a) {
+  if (g.phase === 'kontra' && g.kontraQueue[0] === 0) g.act(0, { type: 'noKontra' });
+  applyBid(0, a);
+}
+
+function applyBid(p, a) {
+  const hand = g.handNo;
+  g.act(p, a);
+  if (p === 0) { kontraTimed = false; clearTimeout(timer); }
+  // Gebote und Pässe stehen dauerhaft als Plakette beim Sitz; nur Kontra bekommt eine Sprechblase
+  if (a.type === 'kontra') say(p, 'Kontra!', { kontra: true, ms: 2200 });
+  selAmount = null; selMode = null;
+  if (g.handNo !== hand) {
+    statusMsg = 'Alle haben gepasst. Es wird neu gegeben.';
+    clearBubbles();
+    render();
+    later(step, 1200);
+    return;
+  }
+  if (g.phase === 'play') { startPlayAnnouncements(); return; }
+  step();
+}
+
+function applyDirection(p, a) {
+  g.act(p, a);
+  say(p, MODE_NAMES[g.mode], { ms: 2600 });
+  startPlayAnnouncements();
+}
+
+function startPlayAnnouncements() {
+  // Weis wird beim Ausspielen der ersten Karte angesagt und nach dem ersten Stich gezeigt
+  statusMsg = '';
+  pausing = true;
+  render();
+  later(() => { pausing = false; step(); }, 500);
+}
+
+// Karten eines Weises aus der Engine-Beschreibung ableiten
+function weisCards(w) {
+  if (w.kind === 'vier') return [0, 1, 2, 3].map(s => J.makeCard(s, w.top));
+  const cs = [];
+  for (let r = w.top; r > w.top - w.n; r--) cs.push(J.makeCard(w.suit, r));
+  return cs;
+}
+let weisShown = null;    // {p, list, counts}
+const WEIS_MS = 3000;
+// Weis-Ablauf wie am Tisch:
+// 1. Beim Ausspielen der ersten Karte wird der Weis nur angesagt («Weis 20»).
+// 2. Nach der vierten Karte des ersten Stichs legt NUR der Spieler mit dem höchsten Weis offen (3 Sekunden).
+//    Sein Team schreibt dazu auch den Weis des Partners.
+function announceWeis(p, ev) {
+  const firstTrick = ev.trickComplete ? g.tricks.length === 1 : g.tricks.length === 0;
+  if (!firstTrick || !g.weis) return;
+  const list = g.weis.perPlayer[p];
+  if (list && list.length) say(p, 'Weis ' + list.reduce((a, w) => a + w.value, 0), { ms: 2200 });
+}
+function bestWeisPlayer() {
+  // gleiche Reihenfolge wie die Engine: ab dem Spieler, der den ersten Stich ausgespielt hat
+  const order = [0, 1, 2, 3].map(i => (g.declarer + i) % 4);
+  let bestP = -1, bestW = null;
+  for (const p of order) {
+    const w = J.bestWeis(g.weis.perPlayer[p]);
+    if (w && (!bestW || J.compareWeis(w, bestW) > 0)) { bestW = w; bestP = p; }
+  }
+  return bestP;
+}
+function maybeShowWeis(p, ev) {
+  if (!ev.trickComplete || g.tricks.length !== 1 || !g.weis || g.weis.winnerTeam < 0) return false;
+  const bp = bestWeisPlayer();
+  if (bp < 0) return false;
+  const t = J.team(bp);
+  weisShown = { p: bp, list: g.weis.perPlayer[bp], teamPts: g.weis.pts[t], partnerPts: g.weis.perPlayer[(bp + 2) % 4].reduce((a, w) => a + w.value, 0) };
+  return true;
+}
+function renderWeis() {
+  const el = $('weisShow');
+  if (!weisShown) { el.innerHTML = ''; return; }
+  const { p, list, teamPts, partnerPts } = weisShown;
+  const total = list.reduce((a, w) => a + w.value, 0);
+  const label = w => w.kind === 'vier' ? `4 ${J.RANKS[w.top]}` : `${w.n} Blatt`;
+  el.innerHTML = `<div class="weis-show p${p}" role="status">
+    <div class="wh">${esc(NAMES[p])} ${p === 0 ? 'hast' : 'hat'} den höchsten Weis: <b>${total}</b></div>
+    <div class="groups">${list.map(w => `<div class="grp"><div class="row">${weisCards(w).map(c => `<div class="mini">${cardSVG(c)}</div>`).join('')}</div><small>${label(w)} · ${w.value}</small></div>`).join('')}</div>
+    <div class="wh">${esc(teamName(J.team(p)))} schreiben <b>${teamPts}</b>${partnerPts ? ` <span class="no">(inkl. ${partnerPts} von ${esc(NAMES[(p + 2) % 4])})</span>` : ''}</div>
+    <div class="bar"></div></div>`;
+}
+
+function playCard(p, c) {
+  if (trickWinner >= 0) { shownTrick = []; trickWinner = -1; }
+  const ev = g.play(p, c);
+  shownTrick = ev.trickComplete ? ev.trickComplete.cards : g.trick.slice();
+  // Stöck ansagen, wenn das zweite Stöck-Blatt fällt
+  if (g.stoeck === p && J.isTrumpMode(g.mode) && (J.rankOf(c) === J.RK || J.rankOf(c) === J.RO) && J.suitOf(c) === g.mode) {
+    const other = J.makeCard(g.mode, J.rankOf(c) === J.RK ? J.RO : J.RK);
+    if (!g.hands[p].includes(other)) say(p, 'Stöck!');
+  }
+  statusMsg = '';
+  announceWeis(p, ev);
+  const showWeis = maybeShowWeis(p, ev);
+  if (showWeis) {
+    // Spiel 3 Sekunden anhalten, damit der Weis gesehen wird
+    pausing = true;
+    trickWinner = ev.trickComplete.winner;
+    statusMsg = `${NAMES[trickWinner]} ${trickWinner === 0 ? 'machst' : 'macht'} den Stich (${ev.trickComplete.cards.reduce((a, x) => a + J.points(x.c, g.mode), 0)} Punkte)`;
+    render();
+    later(() => {
+      weisShown = null;
+      if (ev.trickComplete) { shownTrick = []; trickWinner = -1; }
+      pausing = false; statusMsg = '';
+      step();
+    }, WEIS_MS);
+    return;
+  }
+  if (ev.trickComplete) {
+    trickWinner = ev.trickComplete.winner;
+    pausing = true;
+    statusMsg = `${NAMES[trickWinner]} ${trickWinner === 0 ? 'machst' : 'macht'} den Stich (${ev.trickComplete.cards.reduce((a, x) => a + J.points(x.c, g.mode), 0)} Punkte)`;
+    render();
+    later(() => {
+      pausing = false; shownTrick = []; trickWinner = -1; statusMsg = '';
+      step();
+    }, 1250);
+    return;
+  }
+  step();
+}
+
+// ---------- Darstellung ----------
+const $ = id => document.getElementById(id);
+function esc(s) { return String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])); }
+
+function render() {
+  renderTeams();
+  $('sA').textContent = g.scores[0];
+  $('sB').textContent = g.scores[1];
+  renderInfo();
+  renderSeats();
+  renderCenter();
+  renderStatus();
+  renderOverlay();
+  renderKontra();
+  renderWeis();
+}
+
+function renderKontra() {
+  const b = $('kontraBtn');
+  const live = g.phase === 'kontra' && g.kontraQueue[0] === 0 && !modal;
+  b.disabled = !live;
+  b.classList.toggle('timed', live && kontraTimed);
+  const hb = g.highBid;
+  b.innerHTML = live ? `Kontra!<small>gegen ${NAMES[hb.p]} ${bidText(hb)}</small>` : 'Kontra<small>bei Gegner-Gebot</small>';
+}
+
+function renderInfo() {
+  let html = '';
+  if (g.phase === 'bidding' || g.phase === 'kontra') {
+    const hb = g.highBid;
+    html = `<span class="contract">Geber: ${NAMES[g.dealer]} · ${hb ? `Höchstes Gebot: <b>${hb.amount}</b> ${bidModeIcon(hb.mode)} ${BID_NAME(hb.mode)} von ${NAMES[hb.p]}` : 'Noch kein Gebot'}</span>`;
+  } else if (g.declarer !== undefined && g.phase !== 'bidding') {
+    let dir = '';
+    if (g.mode >= 6 && g.phase === 'play') {
+      // Slalom/Quer: Richtung des laufenden Stichs gut sichtbar anzeigen
+      const n = g.tricks.length, d = g.currentTrickMode();
+      const flip = n > 0 && J.trickMode(g.mode, n - 1) !== d;
+      dir = ` <span class="dir${flip ? ' flip' : ''}">Stich ${n + 1}: ${modeIcon(d)} ${MODE_NAMES[d]}</span>`;
+    }
+    const open = g.phase === 'direction';   // Richtung noch nicht gewählt: nur «Slalom»/«Quer» zeigen
+    html = `<span class="contract">${NAMES[g.declarer]} ${g.declarer === 0 ? 'spielst' : 'spielt'} <b>${g.bid}</b> ${open ? bidModeIcon(g.mode) : modeIcon(g.mode)} ${open ? BID_NAME(g.mode) : MODE_NAMES[g.mode]} ${X(g.mode)}${g.kontra ? ` <span class="k">Kontra von ${NAMES[g.kontraBy]}</span>` : ''}${dir}</span>`;
+  }
+  $('info').innerHTML = html;
+}
+
+function renderSeats() {
+  for (let p = 0; p < 4; p++) {
+    const el = $('seat' + p);
+    const isTurn = g.turn === p && (g.phase === 'bidding' || g.phase === 'kontra' || g.phase === 'direction' || g.phase === 'play') && !pausing;
+    const tag = p === 2 ? '<span class="tag">Partner</span>' : '';
+    const decl = g.phase === 'play' && g.declarer === p ? '<span class="tag">Spieler</span>' : '';
+    const name = `<div class="name${isTurn ? ' turn' : ''}">${NAMES[p]}${tag}${decl}</div>`;
+    const b = bubbles[p] ? `<div class="bubble${bubbles[p].kontra ? ' kontra' : ''}">${esc(bubbles[p].text)}</div>` : '';
+    const call = callHTML(p);
+    if (p === 0) {
+      el.innerHTML = b + handHTML() + `<div style="display:flex;gap:8px;align-items:center">${name}${call}</div>`;
+    } else {
+      const n = g.hands[p].length;
+      const v = p !== 2;
+      el.innerHTML = name + call + `<div class="backs${v ? ' v' : ''}" aria-label="${n} Karten">${'<div class="back"></div>'.repeat(n)}</div>` + b;
+    }
+  }
+  fitHand();
+}
+
+// Letzte Ansage eines Sitzes, sichtbar bis das Reizen endet
+const X = m => `<span class="x">×${J.MULT[m]}</span>`;
+
+function callHTML(p) {
+  if (g.phase !== 'bidding' && g.phase !== 'kontra') return '';
+  let last = null;
+  for (const e of g.bidLog) if (e.p === p) last = e;
+  if (!last) return '';
+  if (last.type === 'pass') return '<div class="call pass">Passe</div>';
+  if (last.type === 'kontra') return '<div class="call kontra">Kontra</div>';
+  const hi = g.highBid && g.highBid.p === p && g.highBid.amount === last.amount;
+  return `<div class="call${hi ? ' hi' : ''}">${last.amount} ${bidModeIcon(last.mode)} ${BID_NAME(last.mode)} ${X(last.mode)}</div>`;
+}
+
+function handHTML() {
+  const mode = g.phase === 'play' ? g.currentTrickMode() : undefined;
+  const hand = J.sortHand(g.hands[0], mode);
+  const myTurn = g.phase === 'play' && g.turn === 0 && !pausing && !modal;
+  const legal = myTurn ? g.legal(0) : [];
+  return `<div class="hand" id="hand">${hand.map(c => {
+    const ok = legal.includes(c);
+    const cls = myTurn ? (ok ? ' playable' : ' dim') : '';
+    return `<button class="card${cls}" data-c="${c}" ${ok ? '' : 'tabindex="-1"'} aria-label="${J.cardName(c)}">${cardSVG(c)}</button>`;
+  }).join('')}</div>`;
+}
+
+function fitHand() {
+  const hand = $('hand');
+  if (!hand) return;
+  const n = hand.children.length;
+  if (n < 2) { document.documentElement.style.setProperty('--overlap', '0px'); return; }
+  const cw = hand.children[0].getBoundingClientRect().width;
+  const avail = $('table').getBoundingClientRect().width - 4;
+  const step = Math.min(cw + 4, (avail - cw) / (n - 1));
+  document.documentElement.style.setProperty('--overlap', Math.max(0, cw - step) + 'px');
+}
+
+function renderCenter() {
+  $('center').innerHTML = shownTrick.map(x =>
+    `<div class="slot p${x.p}${x.p === trickWinner ? ' win' : ''}"><div class="card">${cardSVG(x.c)}</div></div>`).join('');
+}
+
+function renderStatus() {
+  let msg = statusMsg;
+  if (!msg) {
+    if (g.phase === 'kontra' && g.turn === 0 && kontraTimed) msg = `<em>${NAMES[g.highBid.p]} reizt ${bidText(g.highBid)}.</em> Kontra? Drück den roten Knopf an der Tafel.`;
+    else if ((g.phase === 'bidding' || g.phase === 'kontra') && g.turn !== 0) msg = `${NAMES[g.turn]} überlegt …`;
+    else if (g.phase === 'direction' && g.turn !== 0) msg = `${NAMES[g.turn]} wählt die Startrichtung …`;
+    else if (g.phase === 'play' && !pausing) msg = g.turn === 0 ? '<em>Du bist am Zug.</em> Wähle eine helle Karte.' : `${NAMES[g.turn]} ist am Zug …`;
+  }
+  $('status').innerHTML = msg;
+}
+
+function renderOverlay() {
+  const o = $('overlay');
+  if (modal === 'rules') { o.innerHTML = '<div class="scrim"></div>' + rulesHTML(); return; }
+  if (modal === 'result') { o.innerHTML = '<div class="scrim"></div>' + resultHTML(); return; }
+  if (g.phase === 'direction' && g.turn === 0) { o.innerHTML = directionPanelHTML(); return; }
+  if ((g.phase === 'bidding' && g.turn === 0) || humanNextRegular()) { o.innerHTML = bidPanelHTML(); return; }
+  o.innerHTML = '';
+}
+
+function directionPanelHTML() {
+  const quer = g.mode === 8;
+  return `<div class="panel" role="dialog" aria-label="Startrichtung">
+    <h2>${BID_NAME(g.mode)} – womit beginnst du?</h2>
+    <p class="hint">Du hast ${g.bid} ${BID_NAME(g.mode)} bekommen${g.kontra ? ` (Kontra von ${NAMES[g.kontraBy]})` : ''}. ${quer ? 'Die ersten 4 Stiche gehen in die Startrichtung, die letzten 5 in die Gegenrichtung.' : 'Die Richtung wechselt jeden Stich.'} Die Startrichtung bestimmt auch die Kartenwerte: mit Obenabe zählen die Asse, mit Undenufe die Sechser.</p>
+    <div class="row" style="justify-content:stretch">
+      <button class="btn" style="flex:1" data-act="dir-oben">${modeIcon(4)} Obenabe zuerst</button>
+      <button class="btn" style="flex:1" data-act="dir-unten">${modeIcon(5)} Undenufe zuerst</button>
+    </div></div>`;
+}
+
+function bidPanelHTML() {
+  const hb = g.highBid;
+  const allowed = g.allowedBids();
+  if (selAmount !== null && !allowed.includes(selAmount)) selAmount = null;
+  const canBid = selAmount !== null && selMode !== null;
+  return `<div class="panel" role="dialog" aria-label="Reizen">
+    <h2>${hb ? 'Überbieten oder passen' : 'Dein Gebot'}</h2>
+    <p class="hint">${hb ? `Höchstes Gebot: <b>${bidText(hb)}</b> von ${NAMES[hb.p]}${J.team(hb.p) === 0 && hb.p !== 0 ? ' (dein Partner)' : ''}.` : 'Wie viele Kartenpunkte macht ihr zu zweit? Maximum 157, Match 257.'}${g.phase === 'kontra' ? ' Kontra geht über den roten Knopf an der Tafel.' : ''}</p>
+    <div class="lbl">Punkte</div>
+    <div class="chips">${allowed.map(b => `<button class="chip" data-amt="${b}" aria-pressed="${selAmount === b}">${b}</button>`).join('')}</div>
+    <div class="lbl">Spielart · Kartenpunkte, Weis und Stöck zählen mit dem Faktor</div>
+    <div class="chips">${J.BID_MODES.map(m => `<button class="chip" data-mode="${m}" aria-pressed="${selMode === m}">${bidModeIcon(m)}${BID_NAME(m)} ${X(m)}</button>`).join('')}</div>
+    <div class="row">
+      <button class="btn sec" data-act="pass">Passen</button>
+      <button class="btn" data-act="bid" ${canBid ? '' : 'disabled'}>${canBid ? 'Reize ' + selAmount + ' ' + BID_NAME(selMode) : 'Reizen'}</button>
+    </div></div>`;
+}
+
+function resultHTML() {
+  const r = g.lastHand;
+  const over = g.phase === 'gameOver';
+  const dn = NAMES[r.declarer];
+  const sub = [0, 1].map(t => r.cardPts[t] + r.weisPts[t] + r.stoeckPts[t]);
+  const rows = [
+    ['Kartenpunkte', r.cardPts], ['Weis', r.weisPts], ['Stöck', r.stoeckPts],
+    [`<b>× ${r.mult}</b> ${MODE_NAMES[r.mode]}`, sub.map(x => `<b>${x * r.mult}</b>`)],
+    ['Gebot' + (r.kontra ? ` (Kontra von ${NAMES[g.kontraBy]}, ×2)` : '') + ' <small>ohne Faktor</small>', r.made ? [J.team(r.declarer) === 0 ? r.bonus : 0, J.team(r.declarer) === 1 ? r.bonus : 0] : [J.team(r.declarer) === 1 ? r.bonus : 0, J.team(r.declarer) === 0 ? r.bonus : 0]],
+  ];
+  let head = over
+    ? `<h2>${r.gameWinner === 0 ? 'Gewonnen!' : 'Verloren.'}</h2><p class="hint">${r.gameWinner === 0 ? 'Du und ' + NAMES[2] : NAMES[1] + ' und ' + NAMES[3]} gewinnen ${r.scores[r.gameWinner]} zu ${r.scores[1 - r.gameWinner]}${r.doppel ? ', und zwar doppelt, weil der Verlierer unter 2500 blieb' : ''}.</p>`
+    : `<h2>Spiel ${g.handNo} abgerechnet</h2>`;
+  return `<div class="panel" role="dialog" aria-label="Abrechnung">${head}
+    <div class="verdict ${r.made ? 'ok' : 'no'}">${dn} ${r.declarer === 0 ? 'hast' : 'hat'} ${r.bid} ${MODE_NAMES[r.mode]} ${r.made ? 'erfüllt' : 'verfehlt'}${r.match >= 0 ? ' · Match!' : ''}</div>
+    <table class="res"><thead><tr><th></th><th>${esc(teamName(0))}</th><th>${esc(teamName(1))}</th></tr></thead><tbody>
+    ${rows.map(([l, v]) => `<tr><td>${l}</td><td>${v[0]}</td><td>${v[1]}</td></tr>`).join('')}
+    <tr class="tot"><td>Dieses Spiel</td><td>${r.total[0]}</td><td>${r.total[1]}</td></tr>
+    <tr><td>Stand</td><td>${r.scores[0]}</td><td>${r.scores[1]}</td></tr></tbody></table>
+    <div class="row"><button class="btn sec" data-act="rules">Regeln</button><button class="btn" data-act="${over ? 'newgame' : 'next'}">${over ? 'Neue Partie' : 'Nächstes Spiel'}</button></div></div>`;
+}
+
+function rulesHTML() {
+  return `<div class="panel" role="dialog" aria-label="Regeln"><h2>Kurzregeln</h2><div class="rules">
+    <h3>Ziel</h3><p>Du spielst mit ${NAMES[2]} (gegenüber) gegen ${NAMES[1]} (rechts) und ${NAMES[3]} (links). Mit jeder neuen Partie wechselt die Besetzung. Wer zuerst 5000 Punkte hat, gewinnt. Gespielt wird gegen den Uhrzeigersinn.</p>
+    <h3>Reizen</h3><p>Ab 40 in Zehnerschritten bis 150, dann 157 (alle Punkte) oder 257 (Match). Wer am höchsten reizt, bestimmt Trumpf, Obenabe oder Undenufe und spielt aus.</p><h3>Kontra</h3><p>Kontra geben nur die Gegner des Bieters, nie der eigene Partner. Nach jedem Gebot der Gegner leuchtet der rote Kontra-Knopf an der Tafel auf. Bist du nicht direkt danach am Zug, bleibt er drei Sekunden aktiv. Bei Geboten deines Partners bleibt er aus. Mit Kontra zählt der Gebotswert doppelt, und das Reizen endet sofort.</p>
+    <h3>Slalom und Quer</h3><p>Slalom: Die Richtung wechselt jeden Stich zwischen Obenabe und Undenufe. Quer: Die ersten 4 Stiche gehen in die Startrichtung, die letzten 5 in die Gegenrichtung. Gereizt wird nur «Slalom» oder «Quer»; die Startrichtung wählt erst, wer das Spiel bekommt. Oben in der Mitte steht immer, welche Richtung im laufenden Stich gilt.</p>
+    <h3>Kartenwerte</h3><ul><li>Trumpf: Under (Puur) 20, Nell 14, Ass 11, Banner 10, König 4, Ober 3</li><li>Andere Farben: Ass 11, Banner 10, König 4, Ober 3, Under 2</li><li>Obenabe: wie andere Farben, dazu die 8 mit 8 Punkten</li><li>Undenufe: 6 zählt 11, Ass 0, die 8 zählt 8; die 6 ist die höchste Karte</li><li>Slalom und Quer: gezählt wird nach der Startrichtung (Start Obenabe: Asse zählen; Start Undenufe: Sechser zählen)</li><li>Letzter Stich 5, alle Stiche +100</li></ul>
+    <h3>Zugeben</h3><ul><li>Farbe bedienen oder trumpfen. Wer die Farbe nicht hat, spielt frei.</li><li>Bei Trumpf-Ausspiel muss Trumpf kommen. Ausnahme: der Puur allein muss nie zugegeben werden.</li><li>Untertrumpfen ist verboten, ausser man hat nur noch Trümpfe.</li></ul>
+    <h3>Weis und Stöck</h3><p>Weis wird automatisch angesagt: Dreierfolge 20, Viererfolge 50, ab fünf 100, vier Gleiche 100 (auch 6, 7, 8), vier Näll 150, vier Under 200. Nur das Team mit dem besten Weis schreibt. König und Ober im Trumpf geben 20 (Stöck). Beides zählt nicht für das Gebot.</p>
+    <p>Beim Ausspielen der ersten Karte wird der Weis angesagt. Nach dem ersten Stich legt nur der Spieler mit dem höchsten Weis offen; sein Team schreibt auch den Weis des Partners. Bei gleichem Wert gewinnt die Reihe vor vier Gleichen, dann die höhere Karte, dann der Weis in der Trumpffarbe, dann wer zuerst ausgespielt hat.</p>
+    <h3>Faktoren</h3><p>Eicheln ×1, Schellen und Schilten ×2, Obenabe und Undenufe ×3, Slalom und Quer ×4, Rosen ×5. Mit dem Faktor zählen Kartenpunkte, Weis und Stöck beider Teams. Gebot und Kontra zählen ohne Faktor.</p>
+    <h3>Abrechnung</h3><p>Beide Teams schreiben ihre Punkte mal Faktor. Erfüllt das Spielerteam sein Gebot mit den einfachen Kartenpunkten, erhält es den Gebotswert dazu, sonst bekommen ihn die Gegner.</p>
+    </div><div class="row"><button class="btn" data-act="closerules">Zurück</button></div></div>`;
+}
+
+// ---------- Eingaben ----------
+document.addEventListener('click', e => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.c !== undefined && t.classList.contains('playable')) {
+    playCard(0, +t.dataset.c);
+    return;
+  }
+  if (t.dataset.amt) { selAmount = +t.dataset.amt; renderOverlay(); return; }
+  if (t.dataset.mode) { selMode = +t.dataset.mode; renderOverlay(); return; }
+  const act = t.dataset.act;
+  if (!act) return;
+  if (act === 'pass') humanBid({ type: 'pass' });
+  else if (act === 'bid' && selAmount !== null && selMode !== null) humanBid({ type: 'bid', amount: selAmount, mode: selMode });
+  else if (act === 'kontra') { if (g.canKontra(0)) applyBid(0, { type: 'kontra' }); }
+  else if (act === 'dir-oben' || act === 'dir-unten') { if (g.phase === 'direction' && g.turn === 0) applyDirection(0, { type: 'direction', dir: act === 'dir-oben' ? 'oben' : 'unten' }); }
+  else if (act === 'next') { modal = null; weisShown = null; g.nextHand(); shownTrick = []; statusMsg = ''; clearBubbles(); step(); }
+  else if (act === 'newgame') newGame();
+  else if (act === 'rules') { modal = 'rules'; renderOverlay(); }
+  else if (act === 'closerules') {
+    modal = (g.phase === 'handOver' || g.phase === 'gameOver') ? 'result' : null;
+    if (pausing) { pausing = false; shownTrick = []; trickWinner = -1; statusMsg = ''; }
+    render(); step();
+  }
+});
+window.addEventListener('resize', fitHand);
+
+// Regeln-Knopf im Kopf
+const tools = document.querySelector('.tools');
+const rb = document.createElement('button');
+rb.className = 'ghost'; rb.id = 'rulesBtn'; rb.textContent = 'Regeln';
+rb.addEventListener('click', () => { modal = 'rules'; clearTimeout(timer); kontraTimed = false; renderOverlay(); renderKontra(); });
+tools.prepend(rb);
+
+// ---------- Live-Update: laufende Partie erhalten ----------
+function snapshot() {
+  const o = {};
+  for (const k of Object.keys(g)) if (k !== 'rnd') o[k] = g[k];
+  return { g: JSON.parse(JSON.stringify(o)), names: NAMES.slice() };
+}
+function start(data) {
+  if (data && data.g) {
+    if (data.names) NAMES = data.names;
+    g = Object.assign(Object.create(J.Game.prototype), data.g);
+    g.rnd = Math.random;
+    shownTrick = []; trickWinner = -1; pausing = false; modal = null;
+    step();
+  } else newGame();
+}
+window.claude?.hot?.snapshot?.(snapshot);
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
