@@ -1035,6 +1035,13 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       for (const c of lm) if (isTrump(c, m)) avg.set(c, avg.get(c) - 1000);
     }
 
+    if (leading && conv && opts.trumpHold !== false && isTrumpMode(m) && lm.some(c => !isTrump(c, m)) &&
+        !(myTeam === declTeam && trumpPullOK(game, me, kn))) {
+      // Einen Trumpf spielt man nicht einfach aus, weil er gerade der höchste ist: Er sticht später
+      // einen punktereichen Stich. Lieber eine Nebenfarbe anziehen.
+      for (const c of lm) if (isTrump(c, m)) avg.set(c, avg.get(c) - TRUMP_HOLD);
+    }
+
     let best = lm[0];
     for (const c of lm) if (avg.get(c) > avg.get(best)) best = c;
 
@@ -1103,7 +1110,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       // Konvention: mit der stärksten Karte anspielen, wenn die Simulation kaum Unterschied sieht
       // «Stärkste Karte» = ein Bock (höchste noch offene Karte seiner Farbe). Trumpf-Böcke nur im Bieter-Team.
       const close = lm.filter(c => avg.get(best) - avg.get(c) <= LEAD_TOLERANCE);
-      const bocks = close.filter(c => holdsBockCard(game, me, c) && (!isTrump(c, m) || myTeam === declTeam));
+      const bocks = close.filter(c => holdsBockCard(game, me, c) && !isTrump(c, m));
       if (bocks.length && !holdsBockCard(game, me, best)) {
         best = bocks.reduce((a, b) => (avg.get(b) > avg.get(a) ? b : a));
       }
@@ -1111,6 +1118,14 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       best = topOfRun(game, me, best);
     }
     return best;
+  }
+
+  // Trumpf ziehen lohnt sich nur mit Länge: mindestens drei Trümpfe, oder zwei, wenn draussen nicht mehr sind.
+  function trumpPullOK(game, me, kn) {
+    const m = effMode(game);
+    const mine = game.hands[me].filter(c => isTrump(c, m)).length;
+    const outstanding = kn.unknown.filter(c => suitOf(c) === m).length;
+    return mine >= 3 || (mine >= 2 && mine >= outstanding);
   }
 
   // Trumpf-Team, Trumpfspiel, beide Gegner nachweislich ohne Trumpf (haben auf Trumpf nicht bedient)
@@ -1127,6 +1142,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return !side.every(c => inTopRun(game, me, c));
   }
 
+  const TRUMP_HOLD = 12;
   const SIGNAL_AVOID = 24, SIGNAL_PREFER = 12, DISCARD_KEEP = 14, DISCARD_OK = 4, LEAD_TOLERANCE = 8, DUMP_TOLERANCE = 10;
 
   // ---------- Böcke zuerst ----------
@@ -1139,7 +1155,8 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       const oppMayHaveTrump = opp.some(p => !kn.voids[p].has('T') && !kn.voids[p].has(m)) &&
         kn.unknown.some(c => suitOf(c) === m);
       const tb = lm.filter(c => isTrump(c, m) && holdsBockCard(game, me, c));
-      if (oppMayHaveTrump && tb.length) return tb[0];
+      // Trumpf ziehen nur mit Trumpf-Länge; ein einzelner hoher Trumpf wartet auf einen punktereichen Stich
+      if (oppMayHaveTrump && tb.length && trumpPullOK(game, me, kn)) return tb[0];
       // Nachtrumpfen: Mit vielen Trümpfen weiter Trumpf spielen, bis die Gegner keine mehr haben.
       // Ohne Trumpf-Bock mit dem kleinsten Trumpf, damit Puur/Näll der Gegner herauskommen.
       const mine = lm.filter(c => isTrump(c, m));
@@ -1529,6 +1546,31 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return { type: 'direction', dir: up >= down ? 'oben' : 'unten' };
   }
   const outlookCache = new Map();
+  // Wie hoch darf ich mit dieser Hand reizen? Faustregeln guter Spieler:
+  //  Trumpf: 40 + 10 pro Trumpf, Puur +20, Näll +10, Trumpf-Ass +10, Nebenfarben-Ass +5
+  //    (Näll zu viert ohne Puur und Ass: 90; Puur, Näll, Ass zu fünft: 130)
+  //  Obenabe/Undenufe: 30 + 20 pro Ass (Sechser), +5 pro König (Siebner)
+  //  Slalom/Quer: 30 + 15 pro Ass und Sechser
+  //  Hat der Partner dieselbe Spielart schon gereizt: +30 (er trägt einen Teil der Punkte)
+  function bidCap(game, me, m, useBids) {
+    const hand = game.hands[me], has = c => hand.includes(c);
+    const cnt = r => hand.filter(c => rankOf(c) === r).length;
+    let cap;
+    if (m <= 3) {
+      const n = hand.filter(c => suitOf(c) === m).length;
+      const sideA = hand.filter(c => rankOf(c) === RA && suitOf(c) !== m).length;
+      cap = 40 + 10 * n + (has(J.makeCard(m, RU)) ? 20 : 0) + (has(J.makeCard(m, R9)) ? 10 : 0) +
+        (has(J.makeCard(m, RA)) ? 10 : 0) + 5 * sideA;
+    } else if (m === J.OBENABE) cap = 30 + 20 * cnt(RA) + 5 * cnt(J.RK);
+    else if (m === J.UNDENUFE) cap = 30 + 20 * cnt(R6) + 5 * cnt(J.R7);
+    else cap = 30 + 15 * (cnt(RA) + cnt(R6));
+    if (useBids !== false) {
+      const partner = (me + 2) % 4;
+      if (game.bidLog.some(e => e.type === 'bid' && e.p === partner && e.mode === m)) cap += 30;
+    }
+    return cap;
+  }
+
   function evBid(game, me, opts, ev, adj, pBid, rnd, useBids) {
     const allowed = game.allowedBids();
     if (!allowed.length) return { type: 'pass' };
@@ -1550,6 +1592,11 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     for (let m = 0; m < J.NUM_MODES; m++) {
       // Gereizt wird nur 0–5, Slalom (6) und Quer (8); deren Wert ist die bessere der beiden Richtungen
       if (!J.BID_MODES.includes(m) || (!oppHolds && adj[m] === -Infinity && !(J.isOpenDirection(m) && adj[m + 1] > -Infinity))) { vals.push(null); continue; }
+      // Gebotsgrenze: höher als die eigene Hand (plus Partner-Unterstützung) trägt, wird nicht gereizt
+      // Ausnahme Verteidigung: Gegen ein Gegner-Gebot mit höherem Faktor darf ich in einer billigeren Spielart
+      // höher gehen (10 pro Faktor-Unterschied), z.B. Eicheln ×1 gegen Rosen ×5: +40.
+      const block = oppHolds && J.MULT[m] < J.MULT[hb.mode] ? 10 * (J.MULT[hb.mode] - J.MULT[m]) : 0;
+      if (opts.cap !== false && b > bidCap(game, me, m, useBids) + block) { vals.push(null); continue; }
       const cv = openValue(ev, m, b);
       vals.push(cv);
       if (cv.v > bestV) { bestV = cv.v; bestM = m; }
@@ -1624,7 +1671,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return { type: 'bid', amount, mode: bestM };
   }
 
-  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
+  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, bidCap, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.JassAI = api;
 })(typeof window !== 'undefined' ? window : globalThis);
