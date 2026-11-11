@@ -6,6 +6,9 @@
 <meta name="theme-color" content="#12352a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Jass">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Sidi Barrani</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -242,6 +245,7 @@ svg[viewBox^="-17"] { width: 25px !important; }
   background: #1d4a38; color: var(--paper);
 }
 .btn.sec { background: #e8dfc8; color: var(--ink); }
+.btn.kontra { background: var(--kontra, #b3262d); color: #fff; }
 .btn.red { background: var(--red); color: #fff; }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
 .btn svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 4px; }
@@ -640,14 +644,22 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       const min = this.minBid();
       return min === null ? [] : BID_LEVELS.filter(b => b >= min);
     }
+    // Kontra (v22): Jeder Gegner des Höchstbietenden darf jederzeit Kontra sagen, solange dessen Gebot
+    // das höchste ist – unabhängig davon, wer am Zug ist und ob er schon gepasst hat. Das gilt im Reizen
+    // und nach dem Reizen bis zur ersten ausgespielten Karte. Kein Rekontra.
     canKontra(p) {
-      if (!this.highBid || team(p) === team(this.highBid.p)) return false;
-      if (this.phase === 'kontra') return this.kontraQueue[0] === p;
-      return this.phase === 'bidding' && this.turn === p && this.kontraAllowedFor === p;
+      if (!this.highBid || this.kontra || team(p) === team(this.highBid.p)) return false;
+      if (this.phase === 'bidding' || this.phase === 'direction') return true;
+      return this.phase === 'play' && this.tricks.length === 0 && this.trick.length === 0;
     }
 
     act(p, action) {
-      if (this.phase === 'kontra') return this._actKontraWindow(p, action);
+      if (action && action.type === 'kontra') {
+        if (!this.canKontra(p)) throw new Error('Kontra nicht erlaubt');
+        this._applyKontra(p);
+        return;
+      }
+      if (action && action.type === 'noKontra') return; // «kein Kontra» ändert nichts (Kompatibilität)
       if (this.phase === 'direction') return this._actDirection(p, action);
       if (this.phase !== 'bidding') throw new Error('Nicht in der Reizphase');
       if (p !== this.turn) throw new Error('Nicht am Zug: ' + p);
@@ -660,11 +672,6 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
         this.turn = nextP(p);
         return;
       }
-      if (action.type === 'kontra') {
-        if (!this.canKontra(p)) throw new Error('Kontra nicht erlaubt');
-        this._applyKontra(p);
-        return;
-      }
       if (action.type === 'bid') {
         const allowed = this.allowedBids();
         if (!allowed.includes(action.amount)) throw new Error('Ungültige Gebotshöhe ' + action.amount);
@@ -673,32 +680,18 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
         this.bidLog.push({ p, type: 'bid', amount: action.amount, mode: action.mode });
         this.passesInRow = 0;
         this.kontraAllowedFor = -1;
-        // Kontra-Fenster: beide Gegner werden gefragt (zuerst Sitz p+3, dann p+1)
-        this.kontraQueue = [(p + 3) % 4, nextP(p)];
-        this.phase = 'kontra';
-        this.turn = this.kontraQueue[0];
+        if (action.amount === 257) { this._startPlay(); return; } // Match: Reizen endet sofort
+        this.turn = nextP(p);
         return;
       }
       throw new Error('Unbekannte Aktion');
-    }
-
-    _actKontraWindow(p, action) {
-      if (p !== this.kontraQueue[0]) throw new Error('Nicht am Zug (Kontra-Fenster): ' + p);
-      if (action.type === 'kontra') { this._applyKontra(p); return; }
-      if (action.type !== 'noKontra') throw new Error('Im Kontra-Fenster nur kontra/noKontra');
-      this.kontraQueue.shift();
-      if (this.kontraQueue.length) { this.turn = this.kontraQueue[0]; return; }
-      if (this.highBid.amount === 257) { this._startPlay(); return; }
-      this.phase = 'bidding';
-      this.turn = nextP(this.highBid.p);
-      this.kontraAllowedFor = -1; // Kontra nur im Fenster
     }
 
     _applyKontra(p) {
       this.kontra = true;
       this.kontraBy = p;
       this.bidLog.push({ p, type: 'kontra' });
-      this._startPlay();
+      if (this.phase === 'bidding') this._startPlay(); // im Reizen beendet Kontra das Reizen sofort
     }
 
     _redeal() {
@@ -1496,6 +1489,28 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return done ? { pFail: fails / done, diff: diff / done } : { pFail: 0.5, diff: 0 };
   }
 
+  // Spielarten, die ich und mein Partner beide gereizt haben
+  function sharedModes(game, me) {
+    const partner = (me + 2) % 4, mine = new Set(), his = new Set();
+    for (const e of game.bidLog) if (e.type === 'bid') { if (e.p === me) mine.add(e.mode); if (e.p === partner) his.add(e.mode); }
+    return [...mine].filter(m => his.has(m));
+  }
+  // Kann ich unsere gemeinsame Spielart noch weiterreizen (innerhalb der Gebotsgrenze)?
+  function sharedRaise(game, me) {
+    if (game.phase !== 'bidding') return false;
+    const b = game.allowedBids()[0], hb = game.highBid;
+    if (b === undefined) return false;
+    return sharedModes(game, me).some(m => {
+      const block = hb && team(hb.p) !== team(me) && J.MULT[m] < J.MULT[hb.mode] ? 10 * (J.MULT[hb.mode] - J.MULT[m]) : 0;
+      return b <= bidCap(game, me, m, true) + block;
+    });
+  }
+  // Nach dem Reizen (bis zur ersten Karte): Will ich jetzt noch Kontra geben?
+  function chooseKontra(game, me, opts) {
+    opts = opts || {};
+    return game.canKontra(me) && decideKontra(game, me, opts.rnd || Math.random);
+  }
+
   function decideKontra(game, me, rnd) {
     const hb = game.highBid;
     if (!hb || team(hb.p) === team(me)) return false;  // nie auf das eigene Team
@@ -1601,6 +1616,11 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       vals.push(cv);
       if (cv.v > bestV) { bestV = cv.v; bestM = m; }
     }
+    // Gemeinsame Spielart im Team (beide haben sie gesagt): darauf weiterreizen, solange es die Grenze erlaubt
+    if (oppHolds && useBids) {
+      const sm = sharedModes(game, me).find(m => vals[m]);
+      if (sm !== undefined) { api._lastEV = { bid: vals[sm].v, pass: vPass, mode: sm, amount: b, shared: true }; return { type: 'bid', amount: b, mode: sm }; }
+    }
     if (bestM < 0) return { type: 'pass' };
     if (useBids && pBid && vals[pBid.mode] && vals[pBid.mode].v >= bestV - BID.evSwing) { bestM = pBid.mode; bestV = vals[bestM].v; }
     api._lastEst = ev[bestM]; api._lastEV = { bid: bestV, pass: vPass, mode: bestM, amount: b };
@@ -1613,7 +1633,9 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
   function chooseBidAction(game, me, opts) {
     opts = opts || {};
     const rnd = opts.rnd || Math.random;
-    if (game.phase === 'kontra') return { type: decideKontra(game, me, rnd) ? 'kontra' : 'noKontra' };
+    // Kontra (v22): jederzeit möglich, solange das Gegner-Gebot das höchste ist. Ich entscheide an meinem Zug.
+    // Haben mein Partner und ich dieselbe Spielart gesagt, reizen wir lieber diese weiter als Kontra zu geben.
+    if (game.canKontra(me) && opts.kontra !== false && !sharedRaise(game, me) && decideKontra(game, me, rnd)) return { type: 'kontra' };
     // Bisherige Gebote der anderen (letztes Gebot pro Spieler) fliessen in die Simulation ein
     const useBids = opts.useBids !== false;
     const lastBid = {};
@@ -1671,7 +1693,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return { type: 'bid', amount, mode: bestM };
   }
 
-  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, bidCap, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
+  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, bidCap, chooseKontra, sharedModes, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.JassAI = api;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -2028,10 +2050,9 @@ let bubbleTimers = {};
 let statusMsg = '';
 let selAmount = null, selMode = null;
 let modal = null;         // 'result' | 'rules' | null
-let kontraTimed = false;  // Kontra-Knopf läuft mit Zeitbalken
 
 let celebrated = false;
-function newGame() { celebrated = false; assignNames(); g = new J.Game({}); shownTrick = []; trickWinner = -1; pausing = false; modal = null; clearBubbles(); step(); }
+function newGame() { celebrated = false; kontraAsk = -1; kontraAskOpen = false; assignNames(); g = new J.Game({}); shownTrick = []; trickWinner = -1; pausing = false; modal = null; clearBubbles(); step(); }
 
 function clearBubbles() { bubbles = {}; for (const k in bubbleTimers) clearTimeout(bubbleTimers[k]); bubbleTimers = {}; }
 function say(p, text, opts) {
@@ -2149,19 +2170,12 @@ function step() {
   if (modal) return;
   if (g.phase === 'gameOver' && !celebrated) { celebrated = true; celebrate(g.lastHand, () => { modal = 'result'; render(); }); return; }
   if (g.phase === 'handOver' || g.phase === 'gameOver') { modal = 'result'; render(); return; }
-  if (g.phase === 'bidding' || g.phase === 'kontra') {
-    if (g.turn === 0) {
-      if (g.phase === 'kontra' && !humanNextRegular()) {
-        // Du bist nicht direkt danach am Zug: Kontra-Knopf 3 Sekunden lang aktiv, dann geht es weiter
-        kontraTimed = true;
-        renderKontra();
-        later(() => { kontraTimed = false; applyBid(0, { type: 'noKontra' }); }, 3000);
-      }
-      return; // Reiz-Panel bzw. Kontra-Knopf wartet auf dich
-    }
+  if (g.phase === 'bidding') {
+    if (g.turn === 0) return; // Reiz-Panel wartet auf dich; Kontra geht jederzeit über den Knopf
     later(() => { const p = g.turn; applyBid(p, AI.chooseBidAction(g, p)); }, 750);
     return;
   }
+  if (lastKontraChance()) return;
   if (g.phase === 'direction') {
     if (g.turn === 0) return; // Richtungs-Panel wartet auf dich
     later(() => { const p = g.turn; applyDirection(p, AI.chooseDirection(g, p)); }, 900);
@@ -2178,20 +2192,33 @@ function step() {
 const BID_NAME = m => J.bidModeName(m);
 function bidText(a) { return a.amount + ' ' + BID_NAME(a.mode); }
 
-// Bin ich nach dem Kontra-Fenster regulär am Zug? Dann zeige ich gleich das Reiz-Panel.
-function humanNextRegular() {
-  return g.phase === 'kontra' && g.kontraQueue[0] === 0 && g.kontraQueue.length === 1 && g.highBid.amount !== 257;
+// Kontra ist jederzeit möglich, solange das Gegner-Gebot das höchste ist (v22) – auch nach dem eigenen Passen
+// und nach dem Reizen bis zur ersten Karte. Nach dem Reizen fragt das Spiel dich einmal ausdrücklich,
+// damit niemand unter Zeitdruck entscheiden muss.
+let kontraAsk = -1;      // handNo, für die die Schlussfrage schon erledigt ist
+let kontraAskOpen = false;
+function lastKontraChance() {
+  if (g.phase !== 'direction' && g.phase !== 'play') return false;
+  if (g.tricks.length || g.trick.length || g.kontra || kontraAsk === g.handNo) return false;
+  // Bei 257 endet das Reizen sofort: die KI-Gegner bekommen hier ihre Kontra-Gelegenheit
+  if (g.highBid.amount === 257) {
+    for (const p of [1, 2, 3]) if (g.canKontra(p) && AI.chooseKontra(g, p)) { kontraAsk = g.handNo; applyBid(p, { type: 'kontra' }); return true; }
+  }
+  if (!g.canKontra(0)) { kontraAsk = g.handNo; return false; }
+  kontraAskOpen = true; render();
+  return true;
 }
-// Eigene Reiz-Aktion; ein offenes Kontra-Fenster wird dabei stillschweigend mit «kein Kontra» geschlossen
-function humanBid(a) {
-  if (g.phase === 'kontra' && g.kontraQueue[0] === 0) g.act(0, { type: 'noKontra' });
-  applyBid(0, a);
+function answerKontra(yes) {
+  kontraAsk = g.handNo; kontraAskOpen = false;
+  if (yes && g.canKontra(0)) { applyBid(0, { type: 'kontra' }); return; }
+  render(); step();
 }
+function humanBid(a) { applyBid(0, a); }
 
 function applyBid(p, a) {
   const hand = g.handNo;
   g.act(p, a);
-  if (p === 0) { kontraTimed = false; clearTimeout(timer); }
+  if (p === 0) clearTimeout(timer);
   // Gebote und Pässe stehen dauerhaft als Plakette beim Sitz; nur Kontra bekommt eine Sprechblase
   if (a.type === 'kontra') say(p, 'Kontra!', { kontra: true, ms: 2200 });
   selAmount = null; selMode = null;
@@ -2329,9 +2356,9 @@ function render() {
 
 function renderKontra() {
   const b = $('kontraBtn');
-  const live = g.phase === 'kontra' && g.kontraQueue[0] === 0 && !modal;
+  const live = g.canKontra(0) && !modal;
   b.disabled = !live;
-  b.classList.toggle('timed', live && kontraTimed);
+  b.classList.remove('timed');
   const hb = g.highBid;
   b.innerHTML = live ? `Kontra!<small>gegen ${NAMES[hb.p]} ${bidText(hb)}</small>` : 'Kontra<small>bei Gegner-Gebot</small>';
 }
@@ -2390,8 +2417,8 @@ function callHTML(p) {
 }
 
 function handHTML() {
-  const mode = g.phase === 'play' ? g.currentTrickMode() : undefined;
-  const hand = J.sortHand(g.hands[0], mode);
+  // Feste Reihenfolge, unabhängig von Trumpf und Richtung: Schellen, Schilten, Eicheln, Rosen, je Ass bis 6
+  const hand = J.sortHand(g.hands[0]);
   const myTurn = g.phase === 'play' && g.turn === 0 && !pausing && !modal;
   const legal = myTurn ? g.legal(0) : [];
   return `<div class="hand" id="hand">${hand.map(c => {
@@ -2440,8 +2467,8 @@ function renderCenter() {
 function renderStatus() {
   let msg = statusMsg;
   if (!msg) {
-    if (g.phase === 'kontra' && g.turn === 0 && kontraTimed) msg = `<em>${NAMES[g.highBid.p]} reizt ${bidText(g.highBid)}.</em> Kontra? Drück den roten Knopf an der Tafel.`;
-    else if ((g.phase === 'bidding' || g.phase === 'kontra') && g.turn !== 0) msg = `${NAMES[g.turn]} überlegt …`;
+    if (kontraAskOpen) msg = `<em>Das Reizen ist vorbei.</em> Kontra oder nicht?`;
+    else if (g.phase === 'bidding' && g.turn !== 0) msg = `${NAMES[g.turn]} überlegt …`;
     else if (g.phase === 'direction' && g.turn !== 0) msg = `${NAMES[g.turn]} wählt die Startrichtung …`;
     else if (g.phase === 'play' && !pausing) msg = g.turn === 0 ? '<em>Du bist am Zug.</em> Wähle eine helle Karte.' : `${NAMES[g.turn]} ist am Zug …`;
   }
@@ -2453,8 +2480,20 @@ function renderOverlay() {
   if (modal === 'rules') { o.innerHTML = '<div class="scrim"></div>' + rulesHTML(); return; }
   if (modal === 'result') { o.innerHTML = '<div class="scrim"></div>' + resultHTML(); return; }
   if (g.phase === 'direction' && g.turn === 0) { o.innerHTML = directionPanelHTML(); return; }
-  if ((g.phase === 'bidding' && g.turn === 0) || humanNextRegular()) { o.innerHTML = bidPanelHTML(); return; }
+  if (kontraAskOpen && g.canKontra(0)) { o.innerHTML = kontraAskHTML(); return; }
+  if (g.phase === 'bidding' && g.turn === 0) { o.innerHTML = bidPanelHTML(); return; }
   o.innerHTML = '';
+}
+
+function kontraAskHTML() {
+  const hb = g.highBid;
+  return `<div class="panel live" role="dialog" aria-label="Kontra">
+    <h2>Kontra?</h2>
+    <p class="hint">${NAMES[hb.p]} spielt <b>${bidText(hb)}</b>. Du kannst noch Kontra geben, bis die erste Karte gespielt ist. Mit Kontra zählt das Gebot doppelt.</p>
+    <div class="row">
+      <button class="btn sec" data-act="nokontra-ask">Kein Kontra</button>
+      <button class="btn kontra" data-act="kontra-ask">Kontra!</button>
+    </div></div>`;
 }
 
 function directionPanelHTML() {
@@ -2475,7 +2514,7 @@ function bidPanelHTML() {
   const canBid = selAmount !== null && selMode !== null;
   return `<div class="panel live" role="dialog" aria-label="Reizen">
     <h2>${hb ? 'Überbieten oder passen' : 'Dein Gebot'}</h2>
-    <p class="hint">${hb ? `Höchstes Gebot: <b>${bidText(hb)}</b> von ${NAMES[hb.p]}${J.team(hb.p) === 0 && hb.p !== 0 ? ' (dein Partner)' : ''}.` : '<span class="lx">Wie viele Kartenpunkte macht ihr zu zweit? </span>Maximum 157, Match 257.'}${g.phase === 'kontra' ? '<span class="lx"> Kontra geht über den roten Knopf an der Tafel.</span>' : ''}</p>
+    <p class="hint">${hb ? `Höchstes Gebot: <b>${bidText(hb)}</b> von ${NAMES[hb.p]}${J.team(hb.p) === 0 && hb.p !== 0 ? ' (dein Partner)' : ''}.` : '<span class="lx">Wie viele Kartenpunkte macht ihr zu zweit? </span>Maximum 157, Match 257.'}${g.canKontra(0) ? '<span class="lx"> Kontra geht jederzeit über den roten Knopf an der Tafel.</span>' : ''}</p>
     <div class="lbl">Punkte</div>
     <div class="chips">${allowed.map(b => `<button class="chip" data-amt="${b}" aria-pressed="${selAmount === b}">${b}</button>`).join('')}</div>
     <div class="lbl">Spielart<span class="lx"> · Kartenpunkte, Weis und Stöck zählen mit dem Faktor</span></div>
@@ -2511,7 +2550,7 @@ function resultHTML() {
 function rulesHTML() {
   return `<div class="panel" role="dialog" aria-label="Regeln"><h2>Kurzregeln</h2><div class="rules">
     <h3>Ziel</h3><p>Du spielst mit ${NAMES[2]} (gegenüber) gegen ${NAMES[1]} (rechts) und ${NAMES[3]} (links). Mit jeder neuen Partie wechselt die Besetzung. Wer zuerst 5000 Punkte hat, gewinnt. Gespielt wird gegen den Uhrzeigersinn.</p>
-    <h3>Reizen</h3><p>Ab 40 in Zehnerschritten bis 150, dann 157 (alle Punkte) oder 257 (Match). Wer am höchsten reizt, bestimmt Trumpf, Obenabe oder Undenufe und spielt aus.</p><h3>Kontra</h3><p>Kontra geben nur die Gegner des Bieters, nie der eigene Partner. Nach jedem Gebot der Gegner leuchtet der rote Kontra-Knopf an der Tafel auf. Bist du nicht direkt danach am Zug, bleibt er drei Sekunden aktiv. Bei Geboten deines Partners bleibt er aus. Mit Kontra zählt der Gebotswert doppelt, und das Reizen endet sofort.</p>
+    <h3>Reizen</h3><p>Ab 40 in Zehnerschritten bis 150, dann 157 (alle Punkte) oder 257 (Match). Wer am höchsten reizt, bestimmt Trumpf, Obenabe oder Undenufe und spielt aus.</p><h3>Kontra</h3><p>Kontra geben nur die Gegner des Höchstbietenden, nie der eigene Partner. Solange das Gebot der Gegner das höchste ist, leuchtet der rote Kontra-Knopf an der Tafel – ohne Zeitlimit, auch wenn du schon gepasst hast, und nach dem Reizen bis zur ersten Karte. Nach dem Reizen fragt dich das Spiel noch einmal. Mit Kontra zählt der Gebotswert doppelt; im Reizen endet das Reizen damit sofort. Haben du und dein Partner dieselbe Farbe gesagt, reizt der Partner lieber diese weiter, statt Kontra zu geben.</p>
     <h3>Slalom und Quer</h3><p>Slalom: Die Richtung wechselt jeden Stich zwischen Obenabe und Undenufe. Quer: Die ersten 4 Stiche gehen in die Startrichtung, die letzten 5 in die Gegenrichtung. Gereizt wird nur «Slalom» oder «Quer»; die Startrichtung wählt erst, wer das Spiel bekommt. Oben in der Mitte steht immer, welche Richtung im laufenden Stich gilt.</p>
     <h3>Kartenwerte</h3><ul><li>Trumpf: Under (Puur) 20, Nell 14, Ass 11, Banner 10, König 4, Ober 3</li><li>Andere Farben: Ass 11, Banner 10, König 4, Ober 3, Under 2</li><li>Obenabe: wie andere Farben, dazu die 8 mit 8 Punkten</li><li>Undenufe: 6 zählt 11, Ass 0, die 8 zählt 8; die 6 ist die höchste Karte</li><li>Slalom und Quer: gezählt wird nach der Startrichtung (Start Obenabe: Asse zählen; Start Undenufe: Sechser zählen)</li><li>Letzter Stich 5, alle Stiche +100</li></ul>
     <h3>Zugeben</h3><ul><li>Farbe bedienen oder trumpfen. Wer die Farbe nicht hat, spielt frei.</li><li>Bei Trumpf-Ausspiel muss Trumpf kommen. Ausnahme: der Puur allein muss nie zugegeben werden.</li><li>Untertrumpfen ist verboten, ausser man hat nur noch Trümpfe.</li></ul>
@@ -2536,7 +2575,9 @@ document.addEventListener('click', e => {
   if (!act) return;
   if (act === 'pass') humanBid({ type: 'pass' });
   else if (act === 'bid' && selAmount !== null && selMode !== null) humanBid({ type: 'bid', amount: selAmount, mode: selMode });
-  else if (act === 'kontra') { if (g.canKontra(0)) applyBid(0, { type: 'kontra' }); }
+  else if (act === 'kontra') { if (g.canKontra(0)) { if (kontraAskOpen) answerKontra(true); else applyBid(0, { type: 'kontra' }); } }
+  else if (act === 'kontra-ask') answerKontra(true);
+  else if (act === 'nokontra-ask') answerKontra(false);
   else if (act === 'dir-oben' || act === 'dir-unten') { if (g.phase === 'direction' && g.turn === 0) applyDirection(0, { type: 'direction', dir: act === 'dir-oben' ? 'oben' : 'unten' }); }
   else if (act === 'next') { modal = null; weisShown = null; g.nextHand(); shownTrick = []; statusMsg = ''; clearBubbles(); step(); }
   else if (act === 'newgame') newGame();
@@ -2554,7 +2595,7 @@ window.addEventListener('orientationchange', () => setTimeout(layout, 250));
 const tools = document.querySelector('.tools');
 const rb = document.createElement('button');
 rb.className = 'ghost'; rb.id = 'rulesBtn'; rb.textContent = 'Regeln';
-rb.addEventListener('click', () => { modal = 'rules'; clearTimeout(timer); kontraTimed = false; renderOverlay(); renderKontra(); });
+rb.addEventListener('click', () => { modal = 'rules'; clearTimeout(timer); renderOverlay(); renderKontra(); });
 tools.prepend(rb);
 
 // ---------- Live-Update: laufende Partie erhalten ----------
