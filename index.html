@@ -1028,6 +1028,13 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       }
     }
 
+    if (leading && conv && opts.trumpSaver !== false && trumpSaver(game, me, lm, kn)) {
+      // Feste Regel: Die Gegner haben keinen Trumpf mehr. Trumpf anspielen zieht dann nur dem Partner
+      // einen Trumpf heraus, den er später zum Stechen braucht. Erst die Nebenfarben spielen; Trumpf erst,
+      // wenn alle übrigen Karten Böcke sind (dann ist es egal) oder nur noch Trümpfe übrig sind.
+      for (const c of lm) if (isTrump(c, m)) avg.set(c, avg.get(c) - 1000);
+    }
+
     let best = lm[0];
     for (const c of lm) if (avg.get(c) > avg.get(best)) best = c;
 
@@ -1104,6 +1111,20 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       best = topOfRun(game, me, best);
     }
     return best;
+  }
+
+  // Trumpf-Team, Trumpfspiel, beide Gegner nachweislich ohne Trumpf (haben auf Trumpf nicht bedient)
+  // und ich habe noch Nebenkarten, die nicht alle Böcke sind -> keinen Trumpf anspielen.
+  function trumpSaver(game, me, lm, kn) {
+    const m = effMode(game);
+    if (!isTrumpMode(m) || team(me) !== team(game.declarer)) return false;
+    const opp = [(me + 1) % 4, (me + 3) % 4];
+    const oppTrumpless = opp.every(p => kn.voids[p].has('T') || kn.voids[p].has(m)) ||
+      !kn.unknown.some(c => suitOf(c) === m && J.rankOf(c) !== J.RU);
+    if (!oppTrumpless) return false;
+    const side = lm.filter(c => !isTrump(c, m));
+    if (!side.length || side.length === lm.length) return false;
+    return !side.every(c => inTopRun(game, me, c));
   }
 
   const SIGNAL_AVOID = 24, SIGNAL_PREFER = 12, DISCARD_KEEP = 14, DISCARD_OK = 4, LEAD_TOLERANCE = 8, DUMP_TOLERANCE = 10;
@@ -1603,7 +1624,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return { type: 'bid', amount, mode: bestM };
   }
 
-  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
+  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.JassAI = api;
 })(typeof window !== 'undefined' ? window : globalThis);
