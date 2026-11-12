@@ -1451,14 +1451,17 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     for (let c = 0; c < 36; c++) if (!known.includes(c)) rest.push(c);
     let fails = 0, done = 0;
     for (let k = 0; k < n; k++) {
-      let hands = null;
+      let hands = null, last = null;
       for (let tries = 0; tries < 40; tries++) {
         const pool = J.shuffle(rest.slice(), rnd);
         const hs = [[], [], [], []]; let i = 0;
         for (let p = 0; p < 4; p++) hs[p] = p === me ? known.slice() : pool.slice(i, i += 9);
+        last = hs;
         if (plausibleBidderHand(hs[hb.p], hb.mode, hb.amount)) { hands = hs; break; }
       }
-      if (!hands) continue;
+      // Keine «passende» Bieter-Hand möglich (z.B. weil ich Puur und Näll selbst halte): Das Gebot ist aus
+      // meiner Sicht kaum zu schaffen – mit gewöhnlicher Verteilung weiterrechnen statt die Probe zu verwerfen.
+      if (!hands) hands = last;
       const pts = bidPlayout(hands, hb.p, hb.mode);
       done++;
       if (pts[team(hb.p)] < hb.amount) fails++;
@@ -1473,14 +1476,17 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     for (let c = 0; c < 36; c++) if (!known.includes(c)) rest.push(c);
     let fails = 0, done = 0, diff = 0;
     for (let k = 0; k < n; k++) {
-      let hands = null;
+      let hands = null, last = null;
       for (let tries = 0; tries < 40; tries++) {
         const pool = J.shuffle(rest.slice(), rnd);
         const hs = [[], [], [], []]; let i = 0;
         for (let p = 0; p < 4; p++) hs[p] = p === me ? known.slice() : pool.slice(i, i += 9);
+        last = hs;
         if (plausibleBidderHand(hs[hb.p], hb.mode, hb.amount)) { hands = hs; break; }
       }
-      if (!hands) continue;
+      // Keine «passende» Bieter-Hand möglich (z.B. weil ich Puur und Näll selbst halte): Das Gebot ist aus
+      // meiner Sicht kaum zu schaffen – mit gewöhnlicher Verteilung weiterrechnen statt die Probe zu verwerfen.
+      if (!hands) hands = last;
       const pts = bidPlayout(hands, hb.p, hb.mode);
       done++;
       if (pts[team(hb.p)] < hb.amount) fails++;
@@ -1505,6 +1511,17 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       return b <= bidCap(game, me, m, true) + block;
     });
   }
+  // Hat mein Partner nach dem letzten Gebot schon gepasst?
+  function partnerPassedSinceHigh(game, me) {
+    const partner = (me + 2) % 4;
+    for (let i = game.bidLog.length - 1; i >= 0; i--) {
+      const e = game.bidLog[i];
+      if (e.type === 'bid') return false;
+      if (e.p === partner && e.type === 'pass') return true;
+    }
+    return false;
+  }
+
   // Nach dem Reizen (bis zur ersten Karte): Will ich jetzt noch Kontra geben?
   function chooseKontra(game, me, opts) {
     opts = opts || {};
@@ -1633,9 +1650,16 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
   function chooseBidAction(game, me, opts) {
     opts = opts || {};
     const rnd = opts.rnd || Math.random;
-    // Kontra (v22): jederzeit möglich, solange das Gegner-Gebot das höchste ist. Ich entscheide an meinem Zug.
-    // Haben mein Partner und ich dieselbe Spielart gesagt, reizen wir lieber diese weiter als Kontra zu geben.
-    if (game.canKontra(me) && opts.kontra !== false && !sharedRaise(game, me) && decideKontra(game, me, rnd)) return { type: 'kontra' };
+    // Kontra (v23, Daniel): Selber trumpfen bringt meist mehr als Kontra, besonders bei Faktor 3–5.
+    // Darum Kontra nur, wenn (1) ich selbst nicht weiterreizen will, (2) mein Partner nach dem Höchstgebot
+    // schon gepasst hat (sonst nähme ihm das Kontra die Chance, selbst zu reizen) und (3) meine Karten es
+    // rechtfertigen. Sonst warte ich – nach dem Reizen ist Kontra bis zur ersten Karte noch möglich.
+    if (game.canKontra(me) && opts.kontra !== false) {
+      const a = chooseBidAction(game, me, Object.assign({}, opts, { kontra: false }));
+      if (a.type === 'bid') return a;
+      if (partnerPassedSinceHigh(game, me) && decideKontra(game, me, rnd)) return { type: 'kontra' };
+      return a;
+    }
     // Bisherige Gebote der anderen (letztes Gebot pro Spieler) fliessen in die Simulation ein
     const useBids = opts.useBids !== false;
     const lastBid = {};
@@ -2052,7 +2076,7 @@ let selAmount = null, selMode = null;
 let modal = null;         // 'result' | 'rules' | null
 
 let celebrated = false;
-function newGame() { celebrated = false; kontraAsk = -1; kontraAskOpen = false; assignNames(); g = new J.Game({}); shownTrick = []; trickWinner = -1; pausing = false; modal = null; clearBubbles(); step(); }
+function newGame() { celebrated = false; kontraAsk = -1; kontraAskOpen = false; kontraAiChecked = -1; assignNames(); g = new J.Game({}); shownTrick = []; trickWinner = -1; pausing = false; modal = null; clearBubbles(); step(); }
 
 function clearBubbles() { bubbles = {}; for (const k in bubbleTimers) clearTimeout(bubbleTimers[k]); bubbleTimers = {}; }
 function say(p, text, opts) {
@@ -2197,11 +2221,14 @@ function bidText(a) { return a.amount + ' ' + BID_NAME(a.mode); }
 // damit niemand unter Zeitdruck entscheiden muss.
 let kontraAsk = -1;      // handNo, für die die Schlussfrage schon erledigt ist
 let kontraAskOpen = false;
+let kontraAiChecked = -1;
 function lastKontraChance() {
   if (g.phase !== 'direction' && g.phase !== 'play') return false;
   if (g.tricks.length || g.trick.length || g.kontra || kontraAsk === g.handNo) return false;
-  // Bei 257 endet das Reizen sofort: die KI-Gegner bekommen hier ihre Kontra-Gelegenheit
-  if (g.highBid.amount === 257) {
+  // Nach dem Reizen: Die KI-Gegner entscheiden jetzt, ob ihre Karten ein Kontra rechtfertigen
+  // (im Reizen warten sie damit, solange ihr Team selbst noch reizen könnte)
+  if (kontraAiChecked !== g.handNo) {
+    kontraAiChecked = g.handNo;
     for (const p of [1, 2, 3]) if (g.canKontra(p) && AI.chooseKontra(g, p)) { kontraAsk = g.handNo; applyBid(p, { type: 'kontra' }); return true; }
   }
   if (!g.canKontra(0)) { kontraAsk = g.handNo; return false; }
