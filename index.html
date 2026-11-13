@@ -1139,7 +1139,8 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return best;
   }
 
-  // Mit 5+ Trümpfen gestartet, genau zwei Trumpfrunden selbst angespielt, noch Trumpf und Nebenkarten in der Hand
+  // Mit 5+ Trümpfen gestartet, genau zwei Trumpfrunden selbst angespielt, noch Trumpf und Nebenkarten in der Hand,
+  // aber kein Bock in einer Nebenfarbe
   function thirdTrumpRound(game, me) {
     const m = effMode(game);
     if (!isTrumpMode(m) || team(me) !== team(game.declarer)) return false;
@@ -1148,6 +1149,8 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     let played = 0, leads = 0;
     for (const t of game.tricks) for (const { p, c } of t.cards) if (p === me && isTrump(c, m)) played++;
     for (const t of game.tricks) if (t.cards[0].p === me && isTrump(t.cards[0].c, m)) leads++;
+    // Nur ohne Bock in einer Nebenfarbe: Ein Ass oder anderer Bock wird zuerst gespielt (Daniel)
+    if (hand.some(c => !isTrump(c, m) && holdsBockCard(game, me, c))) return false;
     return mineNow + played >= 5 && leads === 2 && mineNow >= 1 && hand.some(c => !isTrump(c, m));
   }
 
