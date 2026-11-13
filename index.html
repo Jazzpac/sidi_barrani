@@ -975,6 +975,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
   }
 
   function chooseCardInner(game, me, opts, rnd, samples, lm) {
+    opts_partnerSuit = opts.partnerSuit !== false;
     if (opts.conventions !== false) {
       const a = angeben(game, me, lm);
       if (a !== null) { api._lastRule = 'Angeben'; return a; }
@@ -1035,6 +1036,17 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       for (const c of lm) if (isTrump(c, m)) avg.set(c, avg.get(c) - TRUMP_HOLD);
     }
 
+    if (!leading && conv && opts.keepPartnerBock !== false && isTrumpMode(m)) {
+      // Feste Regel (Daniel): Gewinnt mein Partner den Stich mit einem Bock (höchste offene Karte der Farbe),
+      // steche ich ihn nicht ab, sondern werfe ab – solange ich noch etwas anderes als Trumpf habe.
+      const wi = trickWinnerIndex(game.trick, m), w = game.trick[wi];
+      const led = suitOf(game.trick[0].c);
+      if (w.p === partner && !isTrump(w.c, m) && suitOf(w.c) === led && holdsBockCardFor(game, w.c) &&
+          !lm.some(c => suitOf(c) === led && !isTrump(c, m)) && lm.some(c => !isTrump(c, m))) {
+        for (const c of lm) if (isTrump(c, m)) avg.set(c, avg.get(c) - 1000);
+      }
+    }
+
     let best = lm[0];
     for (const c of lm) if (avg.get(c) > avg.get(best)) best = c;
 
@@ -1052,7 +1064,11 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       // 2. Auf ein neues Verwerf-Signal des Partners antworte ich beim nächsten Anspiel
       const answer = signalAnswer(game, me, lm);
       if (answer !== null) { api._lastRule = 'Verwerf-Antwort'; return answer; }
-      // 3. Ohne Bock selbst eine Farbe anziehen (klein anspielen, um einen Bock zu erspielen)
+      // 3. Gereizte Farbe des Partners (Daniel): Hat er eine Farbe gereizt, die jetzt nicht Trumpf ist, und sie
+      //    nicht verworfen, hat er dort vermutlich gute Karten. Klein anspielen, damit er stechen kann.
+      const ps = partnerSuitLead(game, me, lm, avg, best, sig);
+      if (ps !== null) { api._lastRule = 'Partner-Farbe aus dem Reizen'; return ps; }
+      // 4. Ohne Bock selbst eine Farbe anziehen (klein anspielen, um einen Bock zu erspielen)
       const own = selfAnziehen(game, me, lm, avg, best);
       if (own !== null) { api._lastRule = 'Selbst anziehen'; return own; }
       api._lastRule = 'Simulation';
@@ -1511,6 +1527,31 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       return b <= bidCap(game, me, m, true) + block;
     });
   }
+  // Farben, die ein Spieler im Reizen als Trumpf gesagt hat
+  function bidSuits(game, p) {
+    const s = new Set();
+    for (const e of game.bidLog) if (e.type === 'bid' && e.p === p && e.mode <= 3) s.add(e.mode);
+    return s;
+  }
+  const PARTNER_SUIT_TOL = 15;
+  function partnerSuitLead(game, me, lm, avg, best, sig) {
+    if (opts_partnerSuit === false) return null;
+    const m = effMode(game), partner = (me + 2) % 4, kn = knowledge(game, me);
+    const cands = [];
+    for (const s of bidSuits(game, partner)) {
+      if (isTrumpMode(m) && s === m) continue;                 // ist ohnehin Trumpf
+      if (sig.discards[partner].has(s) || kn.voids[partner].has(s)) continue; // verworfen oder blank
+      const mine = lm.filter(c => suitOf(c) === s);
+      if (!mine.length) continue;
+      // die kleinste Karte der Farbe (wenig Punkte, schwach)
+      const low = mine.reduce((a, b) => (points(b, m) < points(a, m) || (points(b, m) === points(a, m) && strength(b, m) < strength(a, m)) ? b : a));
+      if (avg.get(best) - avg.get(low) <= PARTNER_SUIT_TOL) cands.push(low);
+    }
+    if (!cands.length) return null;
+    return cands.reduce((a, b) => (avg.get(b) > avg.get(a) ? b : a));
+  }
+  let opts_partnerSuit = true;
+
   // Hat mein Partner nach dem letzten Gebot schon gepasst?
   function partnerPassedSinceHigh(game, me) {
     const partner = (me + 2) % 4;
@@ -1603,6 +1644,21 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return cap;
   }
 
+  // Hat mein Partner diese Spielart im Reizen gesagt?
+  function partnerBid(game, me, m) {
+    const partner = (me + 2) % 4;
+    return game.bidLog.some(e => e.type === 'bid' && e.p === partner && e.mode === m);
+  }
+  // Unterstützung für den Partner-Trumpf: Puur, oder Näll mit mindestens einer weiteren Karte, oder drei Trümpfe
+  function canSupport(hand, t) {
+    const n = hand.filter(c => suitOf(c) === t).length;
+    return hand.includes(J.makeCard(t, RU)) || (hand.includes(J.makeCard(t, R9)) && n >= 2) || n >= 3;
+  }
+  // Starker eigener Trumpf: Grenze ohne Partner-Bonus mindestens 100 (z.B. Puur zu viert, Näll+Ass zu viert)
+  function strongTrump(hand, t) {
+    return bidCap({ hands: [hand], bidLog: [] }, 0, t, false) >= 100;
+  }
+
   function evBid(game, me, opts, ev, adj, pBid, rnd, useBids) {
     const allowed = game.allowedBids();
     if (!allowed.length) return { type: 'pass' };
@@ -1629,6 +1685,8 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       // höher gehen (10 pro Faktor-Unterschied), z.B. Eicheln ×1 gegen Rosen ×5: +40.
       const block = oppHolds && J.MULT[m] < J.MULT[hb.mode] ? 10 * (J.MULT[hb.mode] - J.MULT[m]) : 0;
       if (opts.cap !== false && b > bidCap(game, me, m, useBids) + block) { vals.push(null); continue; }
+      // Partner-Trumpf zeige ich nur an, wenn ich ihn stütze: Puur, Näll zu zweit oder drei Trümpfe (Daniel)
+      if (useBids && opts.support !== false && m <= 3 && partnerBid(game, me, m) && !canSupport(game.hands[me], m)) { vals.push(null); continue; }
       const cv = openValue(ev, m, b);
       vals.push(cv);
       if (cv.v > bestV) { bestV = cv.v; bestM = m; }
@@ -1639,7 +1697,20 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       if (sm !== undefined) { api._lastEV = { bid: vals[sm].v, pass: vPass, mode: sm, amount: b, shared: true }; return { type: 'bid', amount: b, mode: sm }; }
     }
     if (bestM < 0) return { type: 'pass' };
-    if (useBids && pBid && vals[pBid.mode] && vals[pBid.mode].v >= bestV - BID.evSwing) { bestM = pBid.mode; bestV = vals[bestM].v; }
+    // Zum Partner schwenken nur, wenn ich selbst keinen starken Trumpf habe (dann reize ich den eigenen)
+    const strongOwn = opts.support !== false && [0, 1, 2, 3].some(t => vals[t] && strongTrump(game.hands[me], t));
+    if (useBids && pBid && !strongOwn && vals[pBid.mode] && vals[pBid.mode].v >= bestV - BID.evSwing) { bestM = pBid.mode; bestV = vals[bestM].v; }
+    if (strongOwn && useBids) {
+      // Starken eigenen Trumpf zeige ich einmal an (innerhalb der Gebotsgrenze), auch wenn der Partner schon
+      // eine andere Farbe gesagt hat. Danach entscheidet wieder die Rechnung (kein endloses Überbieten).
+      const own = [0, 1, 2, 3].filter(t => vals[t] && strongTrump(game.hands[me], t)).reduce((a, t) => (vals[t].v > vals[a].v ? t : a));
+      const shown = game.bidLog.some(e => e.type === 'bid' && e.p === me && e.mode === own);
+      if (!shown && !(bestM <= 3 && strongTrump(game.hands[me], bestM) && bestM !== own)) {
+        api._lastEV = { bid: vals[own].v, pass: vPass, mode: own, amount: b, strong: true };
+        return { type: 'bid', amount: b, mode: own };
+      }
+      if (bestM === (pBid && pBid.mode) && bestM !== own) { bestM = own; bestV = vals[own].v; }
+    }
     api._lastEst = ev[bestM]; api._lastEV = { bid: bestV, pass: vPass, mode: bestM, amount: b };
     if (b >= 257 && vals[bestM].p < 0.5) return { type: 'pass' };
     const margin = opts.evMargin !== undefined ? opts.evMargin : BID.evMargin;
@@ -1717,7 +1788,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return { type: 'bid', amount, mode: bestM };
   }
 
-  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, bidCap, chooseKontra, sharedModes, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
+  const api = { chooseDirection, BID, _lastEst: 0, _lastEV: null, contractValue, bidOutlook, bidCap, chooseKontra, sharedModes, canSupport, strongTrump, _failP: failProbability, _sure: (h, m) => sureDefense(h, m), _isBock: (g, me, c) => holdsBockCard(g, me, c), _lastRule: '', _trumpSaverTest: (g, me) => trumpSaver(g, me, g.legal(me), knowledge(g, me)), anzugSuits, signals, holdsBock, topOfRun, chooseCard, chooseBidAction, evaluateModes, rolloutChoice, playout, knowledge, sampleHands };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.JassAI = api;
 })(typeof window !== 'undefined' ? window : globalThis);
