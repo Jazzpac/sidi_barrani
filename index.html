@@ -1036,6 +1036,16 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       for (const c of lm) if (isTrump(c, m)) avg.set(c, avg.get(c) - TRUMP_HOLD);
     }
 
+    if (conv && opts.querKeep !== false && game.mode >= 8 && game.tricks.length < 4) {
+      // Quer (Daniel): Nach den ersten vier Stichen dreht die Richtung. Karten, die dann stark sind, behalte ich:
+      // in der Obenabe-Hälfte die Sechser (und Siebner), in der Undenufe-Hälfte die Asse (und Könige).
+      const later = J.trickMode(game.mode, 4);
+      const keepRank = later === J.UNDENUFE ? [[R6, QUER_KEEP], [J.R7, QUER_KEEP / 2]] : [[RA, QUER_KEEP], [J.RK, QUER_KEEP / 2]];
+      if (lm.some(c => !keepRank.some(([r]) => rankOf(c) === r))) {
+        for (const c of lm) for (const [r, v] of keepRank) if (rankOf(c) === r) avg.set(c, avg.get(c) - v);
+      }
+    }
+
     if (!leading && conv && opts.keepPartnerBock !== false && isTrumpMode(m)) {
       // Feste Regel (Daniel): Gewinnt mein Partner den Stich mit einem Bock (höchste offene Karte der Farbe),
       // steche ich ihn nicht ab, sondern werfe ab – solange ich noch etwas anderes als Trumpf habe.
@@ -1099,7 +1109,7 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
         // 1. Trümpfe und Böcke behalten, 2. möglichst wenig Punkte, 3. aus einer Farbe ohne eigenen Bock
         //    (Verwerf-Signal), 4. die schwächste Karte.
         const free = lm.filter(c => !winsWith(c));
-        const keep = c => isTrump(c, m) || inTopRun(game, me, c);
+        const keep = c => isTrump(c, m) || inTopRun(game, me, c) || (opts.querKeep !== false && querFuture(game, c));
         const key = c => [keep(c) ? 1 : 0, points(c, m), holdsBock(game, me, suitOf(c)) ? 1 : 0, strength(c, m)];
         const less = (a, b) => { const ka = key(a), kb = key(b); for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] < kb[i]; return false; };
         best = free.reduce((a, b) => (less(b, a) ? b : a));
@@ -1129,6 +1139,18 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     return best;
   }
 
+  // Mit 5+ Trümpfen gestartet, genau zwei Trumpfrunden selbst angespielt, noch Trumpf und Nebenkarten in der Hand
+  function thirdTrumpRound(game, me) {
+    const m = effMode(game);
+    if (!isTrumpMode(m) || team(me) !== team(game.declarer)) return false;
+    const hand = game.hands[me];
+    const mineNow = hand.filter(c => isTrump(c, m)).length;
+    let played = 0, leads = 0;
+    for (const t of game.tricks) for (const { p, c } of t.cards) if (p === me && isTrump(c, m)) played++;
+    for (const t of game.tricks) if (t.cards[0].p === me && isTrump(t.cards[0].c, m)) leads++;
+    return mineNow + played >= 5 && leads === 2 && mineNow >= 1 && hand.some(c => !isTrump(c, m));
+  }
+
   // Trumpf ziehen lohnt sich nur mit Länge: mindestens drei Trümpfe, oder zwei, wenn draussen nicht mehr sind.
   function trumpPullOK(game, me, kn) {
     const m = effMode(game);
@@ -1148,10 +1170,18 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
     if (!oppTrumpless) return false;
     const side = lm.filter(c => !isTrump(c, m));
     if (!side.length || side.length === lm.length) return false;
+    if (thirdTrumpRound(game, me)) return false; // dritte Runde mit langem Trumpf ist gewollt
     return !side.every(c => inTopRun(game, me, c));
   }
 
+  // Quer, erste Hälfte: Karte, die in der zweiten Richtung stark ist (Sechs/Sieben bzw. Ass/König)
+  function querFuture(game, c) {
+    if (game.mode < 8 || game.tricks.length >= 4) return false;
+    const later = J.trickMode(game.mode, 4), r = rankOf(c);
+    return later === J.UNDENUFE ? (r === R6 || r === J.R7) : (r === RA || r === J.RK);
+  }
   const TRUMP_HOLD = 12;
+  const QUER_KEEP = 12;
   const SIGNAL_AVOID = 24, SIGNAL_PREFER = 12, DISCARD_KEEP = 14, DISCARD_OK = 4, LEAD_TOLERANCE = 8, DUMP_TOLERANCE = 10;
 
   // ---------- Böcke zuerst ----------
@@ -1165,7 +1195,20 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
         kn.unknown.some(c => suitOf(c) === m);
       const tb = lm.filter(c => isTrump(c, m) && holdsBockCard(game, me, c));
       // Trumpf ziehen nur mit Trumpf-Länge; ein einzelner hoher Trumpf wartet auf einen punktereichen Stich
-      if (oppMayHaveTrump && tb.length && trumpPullOK(game, me, kn)) return tb[0];
+      // Austrumpfen von oben (Daniel): zuerst den höchsten Trumpf (Puur, dann Näll …), damit ich die Kontrolle
+      // behalte und danach meine Böcke spielen kann. Ohne Trumpf-Bock folgt unten ein kleiner Trumpf.
+      if (oppMayHaveTrump && tb.length && trumpPullOK(game, me, kn)) {
+        api._pullTrump = true;
+        return tb.reduce((a, b) => (trumpStrength(b) > trumpStrength(a) ? b : a));
+      }
+      // Dritte Trumpfrunde mit langem Trumpf (Daniel): Wer mit 5 oder mehr Trümpfen gestartet ist und schon
+      // zweimal Trumpf gespielt hat, spielt noch eine dritte Runde, auch wenn die Gegner keinen Trumpf mehr haben –
+      // sie müssen dann eine Farbe verwerfen.
+      if (!oppMayHaveTrump && thirdTrumpRound(game, me)) {
+        const mine3 = lm.filter(c => isTrump(c, m));
+        api._pullTrump = true; api._thirdRound = true;
+        return mine3.reduce((a, b) => (points(b, m) < points(a, m) || (points(b, m) === points(a, m) && trumpStrength(b) < trumpStrength(a)) ? b : a));
+      }
       // Nachtrumpfen: Mit vielen Trümpfen weiter Trumpf spielen, bis die Gegner keine mehr haben.
       // Ohne Trumpf-Bock mit dem kleinsten Trumpf, damit Puur/Näll der Gegner herauskommen.
       const mine = lm.filter(c => isTrump(c, m));
