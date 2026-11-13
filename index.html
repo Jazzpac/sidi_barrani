@@ -1046,6 +1046,18 @@ table.res tr.tot td { font-weight: 700; border-bottom: none; border-top: 2px sol
       }
     }
 
+    if (!leading && conv && opts.keepBocks !== false) {
+      // Feste Regel (Daniel): Böcke werden nie geschmiert oder verworfen. Kann ich nicht bedienen, gebe ich eine
+      // andere Karte ab; einen Bock (oder eine Karte meiner Bock-Folge) nur, wenn ich sonst nichts abwerfen kann.
+      const led = suitOf(game.trick[0].c);
+      const follows = c => suitOf(c) === led || (isTrumpMode(m) && isTrump(game.trick[0].c, m) && isTrump(c, m));
+      if (!lm.some(follows)) {
+        const disc = lm.filter(c => !isTrump(c, m));
+        const bockish = c => holdsBockCard(game, me, c) || inTopRun(game, me, c);
+        if (disc.some(c => !bockish(c))) for (const c of disc) if (bockish(c)) avg.set(c, avg.get(c) - 1000);
+      }
+    }
+
     if (!leading && conv && opts.keepPartnerBock !== false && isTrumpMode(m)) {
       // Feste Regel (Daniel): Gewinnt mein Partner den Stich mit einem Bock (höchste offene Karte der Farbe),
       // steche ich ihn nicht ab, sondern werfe ab – solange ich noch etwas anderes als Trumpf habe.
